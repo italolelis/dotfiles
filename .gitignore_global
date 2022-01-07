@@ -1,0 +1,21 @@
+# Node
+npm-debug.log
+node_modules
+bower_components
+
+# Mac
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# WebStorm
+.idea/
+
+# vi
+*~
+
+# General
+*.log
+
+.vscode
