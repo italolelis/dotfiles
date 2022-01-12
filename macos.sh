@@ -10,8 +10,11 @@ if test ! $(which brew); then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
-# Update Homebrew recipes
+# Make sure we’re using the latest Homebrew.
 brew update
+
+# Upgrade any already-installed formulae.
+brew upgrade
 
 # Install all our dependencies with bundle (See Brewfile)
 brew tap homebrew/bundle
@@ -24,3 +27,6 @@ ln -s $DOTFILES/.mackup.cfg $HOME/.mackup.cfg
 source $DOTFILES/.macos
 
 $HOME/.dotfiles/install.sh
+
+# Remove outdated versions from the cellar
+brew cleanup
