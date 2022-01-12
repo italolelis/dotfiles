@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Path to your dotfiles.
-export DOTFILES=$HOME/.dotfiles
+export DOTFILES=$HOME/dotfiles
 
 cd "$(dirname "${BASH_SOURCE}")";
 
