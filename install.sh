@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Path to your dotfiles.
+export DOTFILES=$HOME/.dotfiles
+
 cd "$(dirname "${BASH_SOURCE}")";
 
 git pull origin main;
@@ -23,4 +26,8 @@ else
 		doIt;
 	fi;
 fi;
+
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+echo 'source ~/powerlevel10k/powerlevel10k.zsh-theme' >> $DOTFILES/.zshrc
+
 unset doIt;

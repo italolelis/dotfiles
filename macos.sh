@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# Path to your dotfiles.
+export DOTFILES=$HOME/.dotfiles
+
 echo "Setting up your Mac..."
 
 # Check for Homebrew and install if we don't have it
