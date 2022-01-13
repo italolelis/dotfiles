@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # Path to your dotfiles.
 export DOTFILES=$HOME/dotfiles
@@ -13,8 +13,6 @@ rsync --exclude ".git/" \
 	--exclude "install.sh" \
 	--exclude "README.md" \
 	-avh --no-perms . ~;
-
-source ~/.zshrc;
 
 sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
