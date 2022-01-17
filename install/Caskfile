@@ -1,0 +1,13 @@
+# Install native apps
+# Usage: `brew bundle Caskfile`
+
+install caskroom/cask/brew-cask
+tap caskroom/versions
+tap caskroom/fonts
+
+# main apps
+cask install gpgtools
+cask install obsidian
+
+# music apps
+cask install spotify
