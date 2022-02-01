@@ -32,8 +32,6 @@ cask 'insomnia'
 cask 'maccy'
 cask 'signal'
 cask 'slack'
-cask 'tableplus'
-cask 'telegram-desktop'
 cask 'tunnelbear'
 cask 'visual-studio-code'
 brew "rectangle"
