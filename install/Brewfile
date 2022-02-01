@@ -19,7 +19,6 @@ brew "thefuck"
 brew "tree"
 brew "unar"
 brew "wget"
-brew "mackup"
 
 # Apps
 cask '1password'
@@ -33,5 +32,6 @@ cask 'signal'
 cask 'slack'
 cask 'tunnelbear'
 cask 'visual-studio-code'
-brew "rectangle"
+cask 'tableplus'
+cask "rectangle"
 cask 'zoom'
