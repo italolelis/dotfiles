@@ -22,7 +22,6 @@ brew upgrade
 # Install all our dependencies with bundle (See Brewfile)
 brew tap homebrew/bundle
 brew bundle --file $DOTFILES/install/Brewfile
-brew bundle --file $DOTFILES/install/Caskfile
 
 # Symlink the Mackup config file to the home directory
 ln -s $DOTFILES/.mackup.cfg $HOME/.mackup.cfg

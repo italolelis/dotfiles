@@ -3,6 +3,8 @@ tap 'homebrew/cask-fonts'
 tap 'homebrew/cask-versions'
 tap "homebrew/bundle"
 tap "homebrew/core"
+tap "caskroom/versions"
+tap "caskroom/fonts"
 
 # Binaries
 brew "antibody"
@@ -23,7 +25,7 @@ brew "wget"
 # Apps
 cask '1password'
 cask 'discord'
-cask 'docker'
+cask 'rancher' # Replacement for Docker Desktop
 cask 'google-chrome'
 cask 'gpg-suite'
 cask 'insomnia'
@@ -35,3 +37,6 @@ cask 'visual-studio-code'
 cask 'tableplus'
 cask "rectangle"
 cask 'zoom'
+cask 'protonmail-bridge'
+cask 'spotify'
+cask 'obsidian'
