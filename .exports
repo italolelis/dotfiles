@@ -10,3 +10,5 @@ export LC_ALL='en_US.UTF-8';
 
 # Go in path
 export PATH=$HOME/go/bin:$PATH
+
+export USE_GKE_GCLOUD_AUTH_PLUGIN=True
