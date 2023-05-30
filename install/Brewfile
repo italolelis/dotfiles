@@ -9,8 +9,8 @@ tap "caskroom/fonts"
 # Binaries
 brew "antibody"
 brew "coreutils"
-brew "aws-iam-authenticator"
-brew "awscli"
+# brew "aws-iam-authenticator"
+# brew "awscli"
 brew "fzf"
 brew "gh"
 brew "go"
@@ -25,20 +25,17 @@ brew "wget"
 # Apps
 cask '1password'
 cask 'discord'
-cask 'rancher' # Replacement for Docker Desktop=
+cask 'rancher' # Replacement for Docker Desktop
 cask 'gpg-suite'
 cask 'insomnia' # HTTP client
 cask 'maccy' # Copy history
 cask 'signal' # Messaging app
-cask 'slack' # Company messaging app
-cask 'tunnelbear' # VPN
 cask 'visual-studio-code' # Coding
 cask 'tableplus' # Database client
 cask "rectangle" # Window manager
-cask 'zoom'
 cask 'protonmail-bridge'
+cask 'protonvpn'
 cask 'spotify' # Music 🎶
-cask 'obsidian' # Note taking
 cask 'warp' # Terminal
 cask 'google-chrome'
 cask 'microsoft-edge'
