@@ -40,7 +40,7 @@ If you did all of the above you may now follow these installations instructions 
 4. Run the installation with:
 
     ```zsh
-    ~/.dotfiles/bootstrap.sh
+    ~/.dotfiles/install.sh
     ```
 
 5. After mackup is synced with your cloud storage, restore preferences by running `mackup restore`

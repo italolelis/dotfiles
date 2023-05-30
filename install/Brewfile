@@ -3,8 +3,6 @@ tap 'homebrew/cask-fonts'
 tap 'homebrew/cask-versions'
 tap "homebrew/bundle"
 tap "homebrew/core"
-tap "caskroom/versions"
-tap "caskroom/fonts"
 
 # Binaries
 brew "antibody"
