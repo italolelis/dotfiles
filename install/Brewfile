@@ -7,8 +7,6 @@ tap "homebrew/core"
 # Binaries
 brew "antibody"
 brew "coreutils"
-# brew "aws-iam-authenticator"
-# brew "awscli"
 brew "fzf"
 brew "gh"
 brew "go"
@@ -19,6 +17,8 @@ brew "thefuck"
 brew "tree"
 brew "unar"
 brew "wget"
+brew "kubectl"
+brew "kubectx"
 
 # Apps
 cask '1password'
@@ -37,3 +37,4 @@ cask 'spotify' # Music 🎶
 cask 'warp' # Terminal
 cask 'google-chrome'
 cask 'microsoft-edge'
+cask 'google-cloud-sdk'
