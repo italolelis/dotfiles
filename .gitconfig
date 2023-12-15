@@ -1,7 +1,7 @@
 [user]
 	email = me@italovietro.com
-	name = Italo Vietro
-	signingkey = BF4E0613
+	name = italolelis
+	signingkey = CC4860CD
 
 [github]
 	user = italolelis
@@ -23,9 +23,12 @@
 	helper = osxkeychain
 
 [gpg]
-	program = gpg2
+	program = gpg
 
 [commit]
+	gpgsign = true
+
+[tag]
 	gpgsign = true
 
 [init]
