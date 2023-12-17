@@ -5,7 +5,6 @@ tap "homebrew/bundle"
 tap "homebrew/core"
 
 # Binaries
-brew "antibody"
 brew "coreutils"
 brew "fzf"
 brew "gh"
@@ -21,13 +20,11 @@ brew "kubectl"
 brew "kubectx"
 
 # Apps
-cask '1password'
 cask 'discord'
 cask 'rancher' # Replacement for Docker Desktop
 cask 'gpg-suite'
 cask 'insomnia' # HTTP client
 cask 'maccy' # Copy history
-cask 'signal' # Messaging app
 cask 'visual-studio-code' # Coding
 cask 'tableplus' # Database client
 cask "rectangle" # Window manager
@@ -35,6 +32,4 @@ cask 'protonmail-bridge'
 cask 'protonvpn'
 cask 'spotify' # Music 🎶
 cask 'warp' # Terminal
-cask 'google-chrome'
-cask 'microsoft-edge'
 cask 'google-cloud-sdk'

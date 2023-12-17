@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Path to your dotfiles.
-export DOTFILES=$HOME/projects/dotfiles
+export DOTFILES=$HOME/dotfiles
 
 echo "Setting up your Mac..."
 
