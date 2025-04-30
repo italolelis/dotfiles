@@ -26,10 +26,9 @@ cask 'gpg-suite'
 cask 'insomnia' # HTTP client
 cask 'maccy' # Copy history
 cask 'visual-studio-code' # Coding
-cask 'tableplus' # Database client
 cask "rectangle" # Window manager
 cask 'protonmail-bridge'
-cask 'protonvpn'
 cask 'spotify' # Music 🎶
 cask 'warp' # Terminal
-cask 'google-cloud-sdk'
+brew 'mac-mouse-fix' # MacOS mouse fix
+
