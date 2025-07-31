@@ -70,3 +70,18 @@
 	stl = ls-files -m -o --exclude-standard
 	sts = status -sb
 	unstage = reset --hard HEAD
+	# Modern git aliases
+	graph = log --graph --oneline --all
+	last = log -1 HEAD
+	visual = !gitk
+	who = shortlog -s --
+	# GitHub specific
+	prc = "!f() { git fetch origin pull/$1/head:pr-$1 && git checkout pr-$1; }; f"
+	prm = "!f() { git fetch origin pull/$1/head:pr-$1 && git merge pr-$1; }; f"
+	# Workflow helpers
+	undo = reset --soft HEAD~1
+	cleanup = "!git branch --merged | grep -v '\\*\\|main\\|develop' | xargs -n 1 git branch -d"
+	# Status helpers
+	changes = diff --name-only
+	staged = diff --cached --name-only
+	unmerged = diff --name-only --diff-filter=U

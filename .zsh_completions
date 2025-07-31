@@ -1,0 +1,39 @@
+# Custom zsh completions
+# This file contains custom completion functions
+
+# Docker compose completions
+_docker_compose_completion() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local prev=${COMP_WORDS[COMP_CWORD-1]}
+
+    case $prev in
+        up|down|start|stop|restart|logs|exec|run|build|pull|push)
+            COMPREPLY=( $(docker compose ps --format "table {{.Name}}" | tail -n +2 | grep -v "^$") )
+            ;;
+        *)
+            COMPREPLY=( $(compgen -W "up down start stop restart logs exec run build pull push ps" -- $cur) )
+            ;;
+    esac
+}
+
+# Kubernetes context completion
+_kubectl_context_completion() {
+    local contexts=$(kubectl config get-contexts -o name 2>/dev/null)
+    COMPREPLY=( $(compgen -W "$contexts" -- $cur) )
+}
+
+# Git branch completion with current branch first
+_git_branch_completion() {
+    local branches=$(git branch --format='%(refname:short)' 2>/dev/null)
+    local current=$(git branch --show-current 2>/dev/null)
+    if [ -n "$current" ]; then
+        branches="$current $(echo "$branches" | grep -v "^$current$")"
+    fi
+    COMPREPLY=( $(compgen -W "$branches" -- $cur) )
+}
+
+# Register completions
+complete -F _docker_compose_completion dc
+complete -F _kubectl_context_completion kctx
+complete -F _git_branch_completion gco
+complete -F _git_branch_completion gb

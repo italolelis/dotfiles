@@ -1,0 +1,28 @@
+# Personal configurations
+# This file is for personal settings that shouldn't be committed to the repository
+# Add your personal configurations here
+
+# Example personal configurations:
+# export API_KEY="your-api-key-here"
+# export DATABASE_URL="your-database-url"
+# export AWS_ACCESS_KEY_ID="your-aws-key"
+# export AWS_SECRET_ACCESS_KEY="your-aws-secret"
+
+# Personal aliases
+# alias myproject="cd ~/projects/my-special-project"
+
+# Personal functions
+# function myfunction() {
+#     echo "This is my personal function"
+# }
+
+# Personal environment variables
+# export MY_CUSTOM_VAR="my-value"
+
+# Personal PATH additions
+# export PATH="$HOME/my-custom-tools:$PATH"
+
+# Personal completions
+# if [ -d "$HOME/.my-completions" ]; then
+#     fpath=("$HOME/.my-completions" $fpath)
+# fi

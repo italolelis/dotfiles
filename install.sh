@@ -10,6 +10,7 @@ function doIt() {
 	# Create necessary directories (platform-agnostic)
 	mkdir -p ~/.zsh/cache
 	mkdir -p ~/.npm-global
+	mkdir -p ~/.ssh
 
 	# Sync dotfiles
 	rsync --exclude ".git/" \

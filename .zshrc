@@ -1,7 +1,7 @@
 # Load the shell dotfiles, and then some:
 # * ~/.path can be used to extend `$PATH`.
 # * ~/.extra can be used for other settings you don't want to commit.
-for file in ~/.{path,bash_prompt,exports,aliases,functions,extra}; do
+for file in ~/.{path,exports,aliases,functions,extra,zsh_completions}; do
 	[ -r "$file" ] && [ -f "$file" ] && source "$file";
 done;
 unset file;
@@ -16,7 +16,7 @@ export ZSH=$HOME/.oh-my-zsh
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="agnoster"
+# ZSH_THEME="agnoster"  # Disabled in favor of Starship
 
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
@@ -31,6 +31,9 @@ DISABLE_UPDATE_PROMPT="false"
 COMPLETION_WAITING_DOTS="true"
 
 source $ZSH/oh-my-zsh.sh
+
+# Initialize Starship prompt
+eval "$(starship init zsh)"
 
 # Enhanced SSH agent management for macOS Sonoma
 if [ -z "$SSH_AUTH_SOCK" ]; then
@@ -57,7 +60,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
         autoload -Uz compinit
         compinit
     fi
-    
+
     # Better performance for large directories
     zstyle ':completion:*' accept-exact '*(N)'
     zstyle ':completion:*' use-cache on

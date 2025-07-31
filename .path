@@ -1,0 +1,55 @@
+# PATH additions
+# This file is sourced by .zshrc to add directories to the PATH
+
+# Local bin directory
+export PATH="$HOME/.local/bin:$PATH"
+
+# Go workspace
+export PATH="$HOME/go/bin:$PATH"
+
+# Rust Cargo
+export PATH="$HOME/.cargo/bin:$PATH"
+
+# Python user packages
+export PATH="$HOME/.local/bin:$PATH"
+
+# Node.js global packages
+export PATH="$HOME/.npm-global/bin:$PATH"
+
+# Homebrew (if not already in PATH)
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # Intel Mac
+    if [[ "$(uname -m)" == "x86_64" ]]; then
+        export PATH="/usr/local/bin:$PATH"
+    # Apple Silicon Mac
+    elif [[ "$(uname -m)" == "arm64" ]]; then
+        export PATH="/opt/homebrew/bin:$PATH"
+    fi
+fi
+
+# Development tools
+export PATH="$HOME/.dev/bin:$PATH"
+
+# Custom scripts
+export PATH="$HOME/.scripts:$PATH"
+
+# Android SDK (if installed)
+if [ -d "$HOME/Library/Android/sdk" ]; then
+    export ANDROID_HOME="$HOME/Library/Android/sdk"
+    export PATH="$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH"
+fi
+
+# Flutter (if installed)
+if [ -d "$HOME/flutter" ]; then
+    export PATH="$HOME/flutter/bin:$PATH"
+fi
+
+# Deno (if installed)
+if [ -d "$HOME/.deno" ]; then
+    export PATH="$HOME/.deno/bin:$PATH"
+fi
+
+# Bun (if installed)
+if [ -d "$HOME/.bun" ]; then
+    export PATH="$HOME/.bun/bin:$PATH"
+fi

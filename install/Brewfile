@@ -3,6 +3,7 @@ tap 'homebrew/cask-fonts'
 tap 'homebrew/cask-versions'
 tap "homebrew/bundle"
 tap "homebrew/core"
+tap 'netbirdio/tap/netbird'
 
 # Binaries
 brew "coreutils"
@@ -18,6 +19,7 @@ brew "kubectl"
 brew "kubectx"
 
 # Modern development tools
+brew 'docker'
 brew "bat" # Better cat
 brew "exa" # Modern ls replacement
 brew "fd" # Fast find alternative
@@ -47,12 +49,13 @@ cask 'gpg-suite'
 cask 'discord'
 cask 'warp' # Terminal
 cask 'firefox' # Browser
-cask 'rancher' # Replacement for Docker Desktop
 cask 'cursor' # Coding
 cask 'protonmail-bridge'
 cask 'spotify' # Music 🎶
 cask 'nordvpn' # VPN
 cask 'tableplus' # Database client
+cask 'whatsapp' # WhatsApp
+cask 'netbird-ui' # Netbird
 brew 'mac-mouse-fix' # MacOS mouse fix
 
 # Fonts
