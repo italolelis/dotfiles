@@ -29,6 +29,25 @@ function doIt() {
 		echo "✅ Oh My Zsh already installed"
 	fi
 
+	# Install required Oh My Zsh plugins
+	echo "🔌 Installing Oh My Zsh plugins..."
+
+	# zsh-autosuggestions
+	if [ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions" ]; then
+		echo "📦 Installing zsh-autosuggestions..."
+		git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+	else
+		echo "✅ zsh-autosuggestions already installed"
+	fi
+
+	# zsh-syntax-highlighting
+	if [ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" ]; then
+		echo "📦 Installing zsh-syntax-highlighting..."
+		git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+	else
+		echo "✅ zsh-syntax-highlighting already installed"
+	fi
+
 	# Set up global gitignore (platform-agnostic)
 	if command -v git &> /dev/null; then
 		echo "🔧 Setting up global gitignore..."
