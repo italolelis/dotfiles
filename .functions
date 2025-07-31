@@ -58,7 +58,7 @@ function fs() {
 	fi;
 }
 
-# Use Git’s colored diff when available
+# Use Git's colored diff when available
 hash git &>/dev/null;
 if [ $? -eq 0 ]; then
 	function diff() {
@@ -150,4 +150,71 @@ function o() {
 # small enough for one screen.
 function tre() {
 	tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
+}
+
+# Modern macOS Sonoma functions
+
+# Quick development server with live reload
+function devserver() {
+    local port=${1:-8000}
+    echo "Starting development server on port $port..."
+    python3 -m http.server $port
+}
+
+# Quick git repository initialization with modern defaults
+function gitinit() {
+    git init
+    git branch -M main
+    echo "node_modules/" > .gitignore
+    echo ".DS_Store" >> .gitignore
+    echo "*.log" >> .gitignore
+    git add .gitignore
+    git commit -m "Initial commit with .gitignore"
+    echo "Git repository initialized with main branch and .gitignore"
+}
+
+# Docker container cleanup
+function dockerclean() {
+    echo "Cleaning up Docker containers..."
+    docker container prune -f
+    docker image prune -f
+    docker volume prune -f
+    docker network prune -f
+    echo "Docker cleanup complete!"
+}
+
+# Quick port check
+function portcheck() {
+    local port=${1:-80}
+    if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null ; then
+        echo "Port $port is in use by:"
+        lsof -Pi :$port -sTCP:LISTEN
+    else
+        echo "Port $port is available"
+    fi
+}
+
+# macOS system info
+function sysinfo() {
+    echo "=== macOS System Information ==="
+    echo "OS Version: $(sw_vers -productVersion)"
+    echo "Build: $(sw_vers -buildVersion)"
+    echo "Architecture: $(uname -m)"
+    echo "Kernel: $(uname -r)"
+    echo "Uptime: $(uptime)"
+    echo "Memory: $(vm_stat | grep 'Pages free:' | awk '{print $3}' | sed 's/\.//') pages free"
+    echo "Disk Usage:"
+    df -h / | tail -1
+}
+
+# Quick backup function
+function backup() {
+    local source=${1:-.}
+    local dest=${2:-~/backups}
+    local timestamp=$(date +%Y%m%d_%H%M%S)
+    local backup_name="backup_$(basename $source)_$timestamp.tar.gz"
+    
+    mkdir -p "$dest"
+    tar -czf "$dest/$backup_name" "$source"
+    echo "Backup created: $dest/$backup_name"
 }

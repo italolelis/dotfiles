@@ -5,6 +5,13 @@ cd "$(dirname "${BASH_SOURCE}")";
 git pull origin main;
 
 function doIt() {
+	echo "🚀 Installing dotfiles..."
+
+	# Create necessary directories (platform-agnostic)
+	mkdir -p ~/.zsh/cache
+	mkdir -p ~/.npm-global
+
+	# Sync dotfiles
 	rsync --exclude ".git/" \
 		--exclude ".DS_Store" \
 		--exclude ".osx" \
@@ -12,7 +19,25 @@ function doIt() {
 		--exclude "README.md" \
 		-avh --no-perms . ~;
 
-	sh -c "$(wget -O- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+	echo "✅ Dotfiles synced successfully!"
+
+	# Install Oh My Zsh if not already installed
+	if [ ! -d "$HOME/.oh-my-zsh" ]; then
+		echo "📦 Installing Oh My Zsh..."
+		sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
+	else
+		echo "✅ Oh My Zsh already installed"
+	fi
+
+	# Set up global gitignore (platform-agnostic)
+	if command -v git &> /dev/null; then
+		echo "🔧 Setting up global gitignore..."
+		git config --global core.excludesfile ~/.gitignore_global
+	else
+		echo "⚠️  Git not found, skipping gitignore setup"
+	fi
+
+	echo "🎉 Installation complete! Please restart your terminal or run 'source ~/.zshrc'"
 }
 
 if [ "$1" == "--force" -o "$1" == "-f" ]; then
@@ -25,4 +50,3 @@ else
 	fi;
 fi;
 unset doIt;
-

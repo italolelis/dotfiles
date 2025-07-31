@@ -1,14 +1,14 @@
 [user]
 	email = me@italovietro.com
 	name = italolelis
-	signingkey = F2035938D7A487C13848668120785B4CAFBAD6A8
+	signingkey = D7D9BB26A1F695BD781F0615D62ED35E99570398
 
 [github]
 	user = italolelis
 
 [core]
-	excludesfile = ~/.config/git/ignore
-    editor = code --wait
+	excludesfile = ~/.gitignore_global
+    editor = cursor --wait
 	filemode = false
 	trustctime = false
 	autocrlf = input

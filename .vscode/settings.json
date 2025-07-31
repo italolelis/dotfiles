@@ -1,7 +1,24 @@
 {
-    "workbench.colorCustomizations": {
-        "activityBar.background": "#1C3312",
-        "titleBar.activeBackground": "#284819",
-        "titleBar.activeForeground": "#F6FBF4"
-    }
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#1C3312",
+    "titleBar.activeBackground": "#284819",
+    "titleBar.activeForeground": "#F6FBF4"
+  },
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "git.enableSmartCommit": true,
+  "git.confirmSync": false,
+  "git.autofetch": true,
+  "explorer.confirmDelete": false,
+  "explorer.confirmDragAndDrop": false
 }

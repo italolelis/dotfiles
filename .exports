@@ -12,3 +12,27 @@ export LC_ALL='en_US.UTF-8';
 export PATH=$HOME/go/bin:$PATH
 
 export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+
+# Modern development environment variables
+export EDITOR="cursor"
+export VISUAL="cursor"
+export PAGER="less"
+
+# Node.js and npm optimizations
+export NODE_ENV=development
+export npm_config_prefix="$HOME/.npm-global"
+export PATH="$HOME/.npm-global/bin:$PATH"
+
+# Python virtual environment
+export PYTHONPATH="${PYTHONPATH}:${HOME}/.local/lib/python3.11/site-packages"
+
+# Docker optimizations for macOS
+export DOCKER_BUILDKIT=1
+export COMPOSE_DOCKER_CLI_BUILD=1
+
+# Security improvements
+export HOMEBREW_NO_ANALYTICS=1
+export HOMEBREW_NO_INSECURE_REDIRECT=1
+
+# Performance optimizations for macOS Sonoma
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
