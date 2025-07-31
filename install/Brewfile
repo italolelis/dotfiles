@@ -8,27 +8,53 @@ tap "homebrew/core"
 brew "coreutils"
 brew "fzf"
 brew "gh"
-brew "go"
 brew "httpie"
 brew "jq"
 brew "python"
-brew "thefuck"
 brew "tree"
 brew "unar"
 brew "wget"
 brew "kubectl"
 brew "kubectx"
 
+# Modern development tools
+brew "bat" # Better cat
+brew "exa" # Modern ls replacement
+brew "fd" # Fast find alternative
+brew "ripgrep" # Fast grep alternative
+brew "tldr" # Simplified man pages
+brew "zsh-autosuggestions"
+brew "zsh-syntax-highlighting"
+brew "starship" # Modern shell prompt
+
+# Security and networking
+brew "openssl"
+brew "nmap"
+brew "wireshark"
+brew "gpg"
+
+# Development utilities
+brew "git-delta" # Better git diff
+brew "git-lfs"
+brew "pre-commit"
+brew "shellcheck" # Shell script linting
+
 # Apps
-cask 'discord'
-cask 'rancher' # Replacement for Docker Desktop
-cask 'gpg-suite'
-cask 'insomnia' # HTTP client
-cask 'maccy' # Copy history
-cask 'visual-studio-code' # Coding
 cask "rectangle" # Window manager
+cask 'maccy' # Copy history
+cask 'insomnia' # HTTP client
+cask 'gpg-suite'
+cask 'discord'
+cask 'warp' # Terminal
+cask 'firefox' # Browser
+cask 'rancher' # Replacement for Docker Desktop
+cask 'cursor' # Coding
 cask 'protonmail-bridge'
 cask 'spotify' # Music 🎶
-cask 'warp' # Terminal
+cask 'nordvpn' # VPN
+cask 'tableplus' # Database client
 brew 'mac-mouse-fix' # MacOS mouse fix
 
+# Fonts
+cask "font-fira-code"
+cask "font-jetbrains-mono"

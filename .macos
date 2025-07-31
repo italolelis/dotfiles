@@ -45,7 +45,7 @@ defaults write NSGlobalDomain NSDocumentSaveNewDocumentsToCloud -bool false
 # Automatically quit printer app once the print jobs complete
 defaults write com.apple.print.PrintingPrefs "Quit When Finished" -bool true
 
-# Disable the “Are you sure you want to open this application?” dialog
+# Disable the "Are you sure you want to open this application?" dialog
 defaults write com.apple.LaunchServices LSQuarantine -bool false
 
 # Disable Resume system-wide
@@ -57,6 +57,17 @@ defaults write com.apple.CrashReporter DialogType -string "none"
 # Restart automatically if the computer freezes
 sudo systemsetup -setrestartfreeze on
 
+# macOS Tahoe 26.0 Beta specific improvements
+# Enable Stage Manager (new in Tahoe)
+defaults write com.apple.WindowManager GloballyEnabled -bool true
+
+# Enable Live Activities in Dynamic Island (if available)
+defaults write com.apple.controlcenter "NSStatusItem Visible LiveActivities" -bool true
+
+# Enable new Control Center features
+defaults write com.apple.controlcenter "NSStatusItem Visible Battery" -bool true
+defaults write com.apple.controlcenter "NSStatusItem Visible WiFi" -bool true
+
 ###############################################################################
 # Keyboard & Input                                                            #
 ###############################################################################
@@ -67,12 +78,23 @@ defaults write com.apple.BezelServices kDimTime -int 300
 # Disable auto-correct
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
 
+# Enable new keyboard features in Tahoe
+defaults write NSGlobalDomain NSAutomaticQuoteSubstitutionEnabled -bool false
+defaults write NSGlobalDomain NSAutomaticDashSubstitutionEnabled -bool false
+
+# Enable new typing features
+defaults write NSGlobalDomain NSAutomaticPeriodSubstitutionEnabled -bool false
+
 ###############################################################################
 # Trackpad, mouse, Bluetooth accessories                                      #
 ###############################################################################
 
 # Increase sound quality for Bluetooth headphones/headsets
 defaults write com.apple.BluetoothAudioAgent "Apple Bitpool Min (editable)" -int 40
+
+# Enable new trackpad gestures in Tahoe
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadRightClick -bool true
 
 ###############################################################################
 # Screen                                                                      #
@@ -93,6 +115,9 @@ defaults write com.apple.screencapture disable-shadow -bool true
 
 # Enable subpixel font rendering on non-Apple LCDs
 defaults write NSGlobalDomain AppleFontSmoothing -int 2
+
+# Enable new display features in Tahoe
+defaults write com.apple.universalcontrol allowCollectionOfInput -bool true
 
 ###############################################################################
 # Finder                                                                      #
@@ -146,8 +171,11 @@ defaults write com.apple.NetworkBrowser BrowseAllInterfaces -bool true
 defaults write com.apple.finder FXPreferredViewStyle -string "Nlsv"
 
 # Expand the following File Info panes:
-# “General”, “Open with”, and “Sharing & Permissions”
+# "General", "Open with", and "Sharing & Permissions"
 defaults write com.apple.finder FXInfoPanesExpanded -dict General -bool true OpenWith -bool true Privileges -bool true
+
+# Enable new Finder features in Tahoe
+defaults write com.apple.finder ShowRecentTags -bool false
 
 ###############################################################################
 # Dock                                                                        #
@@ -165,11 +193,14 @@ defaults write com.apple.dock showhidden -bool true
 # Don't show recently used applications in the Dock
 defaults write com.Apple.Dock show-recents -bool false
 
+# Enable new Dock features in Tahoe
+defaults write com.apple.dock mru-spaces -bool false
+
 ###############################################################################
 # Calendar                                                                    #
 ###############################################################################
 
-# Show week numbers (10.8 only)
+# Show week numbers
 defaults write com.apple.iCal "Show Week Numbers" -bool true
 
 # Week starts on monday
@@ -233,9 +264,32 @@ defaults write com.apple.commerce AutoUpdate -bool true
 defaults write com.apple.commerce AutoUpdateRestartRequired -bool true
 
 ###############################################################################
+# Security & Privacy                                                          #
+###############################################################################
+
+# Enable new security features in Tahoe
+defaults write com.apple.screensaver askForPasswordDelay -int 0
+
+# Enable FileVault (if not already enabled)
+# sudo fdesetup enable
+
+###############################################################################
+# Performance & Battery                                                       #
+###############################################################################
+
+# Optimize for performance
+defaults write NSGlobalDomain NSDocumentRevisionsKeepEveryOne -bool false
+
+# Enable new performance features in Tahoe
+defaults write com.apple.dock autohide-delay -float 0
+defaults write com.apple.dock autohide-time-modifier -float 0
+
+###############################################################################
 # Kill affected applications                                                  #
 ###############################################################################
 
-for app in "Address Book" "Calendar" "Contacts" "Dock" "Finder" "Mail" "Safari" "SystemUIServer" "iCal"; do
+for app in "Address Book" "Calendar" "Contacts" "Dock" "Finder" "Mail" "Safari" "SystemUIServer" "iCal" "ControlCenter" "WindowManager"; do
   killall "${app}" &> /dev/null
 done
+
+echo "🎉 macOS Tahoe 26.0 Beta preferences applied successfully!"
