@@ -47,8 +47,8 @@ cask 'maccy' # Copy history
 cask 'insomnia' # HTTP client
 cask 'gpg-suite'
 cask 'discord'
-cask 'warp' # Terminal
-cask 'firefox' # Browser
+cask 'ghostty' # Terminal
+cask 'arc' # Browser
 cask 'cursor' # Coding
 cask 'protonmail-bridge'
 cask 'spotify' # Music 🎶

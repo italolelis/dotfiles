@@ -2,8 +2,6 @@
 
 cd "$(dirname "${BASH_SOURCE}")";
 
-git pull origin main;
-
 function doIt() {
 	echo "🚀 Installing dotfiles..."
 
@@ -11,12 +9,14 @@ function doIt() {
 	mkdir -p ~/.zsh/cache
 	mkdir -p ~/.npm-global
 	mkdir -p ~/.ssh
+	mkdir -p ~/.config/ghostty
 
 	# Sync dotfiles
 	rsync --exclude ".git/" \
 		--exclude ".DS_Store" \
 		--exclude ".osx" \
 		--exclude "install.sh" \
+		--exclude "macos.sh" \
 		--exclude "README.md" \
 		-avh --no-perms . ~;
 

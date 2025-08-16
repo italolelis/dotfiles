@@ -1,0 +1,30 @@
+# Ghostty Terminal Configuration
+# See: https://ghostty.org/docs/config for all options
+
+# Font settings
+font-family = "JetBrains Mono"
+font-size = 13
+
+# Window appearance
+window-padding-x = 8
+window-padding-y = 8
+window-decoration = true
+macos-titlebar-style = tabs
+
+# Theme and colors
+theme = "Monokai Pro"
+background-opacity = 0.95
+
+# Cursor
+cursor-style = block
+cursor-style-blink = false
+
+# Shell integration
+shell-integration = zsh
+
+# Performance
+copy-on-select = true
+
+# Font ligatures
+font-feature = +liga
+font-feature = +clig

@@ -40,6 +40,7 @@ echo "📁 Creating necessary directories..."
 mkdir -p ~/.zsh/cache
 mkdir -p ~/.npm-global
 mkdir -p ~/.config/git
+mkdir -p ~/.config/ghostty
 
 # Set up global gitignore
 if command -v git &> /dev/null; then
