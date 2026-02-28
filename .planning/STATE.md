@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-02-28T12:59:26.643Z"
+last_updated: "2026-02-28T13:50:32.825Z"
 progress:
-  total_phases: 1
+  total_phases: 2
   completed_phases: 1
-  total_plans: 4
-  completed_plans: 4
+  total_plans: 7
+  completed_plans: 6
 ---
 
 # Project State
@@ -23,28 +23,28 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 2 of 4 (Shell)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-02-28 — Completed 02-01 (antidote migration, .zshrc rewrite)
+Last activity: 2026-02-28 — Completed 02-02 (zsh support files cleanup: .path, .exports, .aliases, .functions, .zsh_completions)
 
-Progress: [████░░░░░░] 40%
+Progress: [█████░░░░░] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 2min
-- Total execution time: 0.03 hours
+- Total plans completed: 3
+- Average duration: 3min
+- Total execution time: 0.13 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Foundation | 1 | 2min | 2min |
-| 2. Shell | 1 | 2min | 2min |
+| 2. Shell | 2 | 6min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (2min), 02-01 (2min)
+- Last 5 plans: 01-01 (2min), 02-01 (2min), 02-02 (4min)
 - Trend: stable
 
 *Updated after each plan completion*
@@ -74,6 +74,10 @@ Recent decisions affecting current work:
 - [02-01]: ez-compinit placed first in .zsh_plugins.txt to prevent double-compinit (RESEARCH Pitfall 1)
 - [02-01]: SSH agent block removed entirely — 1Password SSH agent handles this; Warp block removed — Ghostty is the terminal
 - [02-01]: .zsh_completions excluded from source loop — ez-compinit handles compinit; plan 02-02 will clean up remaining compdef calls
+- [Phase 02-shell]: [02-02]: .path is single source of truth for PATH — go/bin and npm-global/bin moved from .exports; duplicate .local/bin removed
+- [Phase 02-shell]: [02-02]: STARSHIP_CONFIG added to .exports pointing to ~/.starship.toml — wires starship Stow package without restructuring
+- [Phase 02-shell]: [02-02]: .zsh_completions must be sourced AFTER antidote block in .zshrc — plan 02-01 executor must add sourcing line
+- [Phase 02-shell]: [02-02]: update alias simplified to brew-only; PYTHONPATH removed; bash HIST vars removed from .exports
 
 ### Pending Todos
 
@@ -88,5 +92,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Completed 02-01-PLAN.md
-Resume file: .planning/phases/02-shell/02-02-PLAN.md
+Stopped at: Completed 02-02-PLAN.md
+Resume file: .planning/phases/02-shell/02-03-PLAN.md
