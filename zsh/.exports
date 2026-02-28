@@ -1,38 +1,32 @@
-# Increase Bash history size. Allow 32³ entries; the default is 500.
-export HISTSIZE='32768';
-export HISTFILESIZE="${HISTSIZE}";
-# Omit duplicates and commands that begin with a space from history.
-export HISTCONTROL='ignoreboth';
+# Environment variable exports
+# NOTE: All PATH modifications live in .path — do NOT add PATH exports here.
 
-# Prefer US English and use UTF-8.
-export LANG='en_US.UTF-8';
-export LC_ALL='en_US.UTF-8';
+# Locale
+export LANG='en_US.UTF-8'
+export LC_ALL='en_US.UTF-8'
 
-# Go in path
-export PATH=$HOME/go/bin:$PATH
-
-export USE_GKE_GCLOUD_AUTH_PLUGIN=True
-
-# Modern development environment variables
+# Default applications
 export EDITOR="cursor"
 export VISUAL="cursor"
 export PAGER="less"
 
-# Node.js and npm optimizations
+# Starship prompt config location (wires starship/.starship.toml Stow package)
+export STARSHIP_CONFIG="$HOME/.starship.toml"
+
+# Node.js and npm
 export NODE_ENV=development
 export npm_config_prefix="$HOME/.npm-global"
-export PATH="$HOME/.npm-global/bin:$PATH"
-
-# Python virtual environment
-export PYTHONPATH="${PYTHONPATH}:${HOME}/.local/lib/python3.11/site-packages"
 
 # Docker optimizations for macOS
 export DOCKER_BUILDKIT=1
 export COMPOSE_DOCKER_CLI_BUILD=1
 
-# Security improvements
+# Homebrew privacy
 export HOMEBREW_NO_ANALYTICS=1
 export HOMEBREW_NO_INSECURE_REDIRECT=1
 
-# Performance optimizations for macOS Sonoma
+# Google Cloud SDK auth plugin
+export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+
+# macOS fork safety (TODO: verify if still needed on current macOS)
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES

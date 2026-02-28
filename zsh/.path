@@ -1,5 +1,6 @@
 # PATH additions
-# This file is sourced by .zshrc to add directories to the PATH
+# This file is the single source of truth for all PATH modifications.
+# It is sourced by .zshrc before other dotfiles.
 
 # Local bin directory
 export PATH="$HOME/.local/bin:$PATH"
@@ -10,13 +11,10 @@ export PATH="$HOME/go/bin:$PATH"
 # Rust Cargo
 export PATH="$HOME/.cargo/bin:$PATH"
 
-# Python user packages
-export PATH="$HOME/.local/bin:$PATH"
-
 # Node.js global packages
 export PATH="$HOME/.npm-global/bin:$PATH"
 
-# Homebrew (if not already in PATH)
+# Homebrew (macOS — Intel vs Apple Silicon)
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # Intel Mac
     if [[ "$(uname -m)" == "x86_64" ]]; then
