@@ -1,0 +1,20 @@
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+
+# Dotfiles management
+.backup/
+.planning/phases/**/*-SUMMARY.md
+.planning/phases/**/*-VERIFICATION.md
+.planning/phases/**/*-UAT.md
+
+# Editor
+.vscode/
+*.swp
+*.swo
+*~
+
