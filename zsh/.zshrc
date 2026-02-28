@@ -50,7 +50,15 @@ fi
 # Only regenerates when .zsh_plugins.txt is newer (saves ~180ms vs antidote load)
 zsh_plugins=${ZDOTDIR:-~}/.zsh_plugins
 [[ -f ${zsh_plugins}.txt ]] || touch ${zsh_plugins}.txt
-fpath=("$(brew --prefix)/opt/antidote/share/antidote/functions" $fpath)
+
+if [[ $(uname -s) == Darwin ]]; then
+  # macOS: antidote installed via Homebrew
+  fpath=("$(brew --prefix)/opt/antidote/share/antidote/functions" $fpath)
+else
+  # Linux: antidote installed via git clone to ~/.antidote
+  [[ -d "$HOME/.antidote" ]] && source "$HOME/.antidote/antidote.zsh"
+fi
+
 autoload -Uz antidote
 if [[ ! ${zsh_plugins}.zsh -nt ${zsh_plugins}.txt ]]; then
   antidote bundle <${zsh_plugins}.txt >|${zsh_plugins}.zsh
@@ -76,4 +84,6 @@ fi
 
 # ── 10. Starship prompt ──────────────────────────────────────────────────────
 # Always last — prompt init must come after all plugins and completions
-eval "$(starship init zsh)"
+if command -v starship &>/dev/null; then
+  eval "$(starship init zsh)"
+fi
