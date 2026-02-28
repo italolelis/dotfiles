@@ -27,13 +27,13 @@ Modernize an existing dotfiles repo from rsync-based file copying to a symlink-m
   3. Running `brew bundle check` passes with no missing packages
   4. Git config (signing key, aliases, global gitignore) is loaded and working in a fresh shell
   5. macOS defaults script runs without errors on Sequoia
-**Plans**: TBD
+**Plans:** 4 plans in 2 waves
 
 Plans:
-- [ ] 01-01: Restructure repo into Stow packages and audit configs for secrets
-- [ ] 01-02: Replace rsync install script with idempotent Stow-based install.sh
-- [ ] 01-03: Reconcile Brewfile with current machine state and integrate brew bundle
-- [ ] 01-04: Migrate Git config and macOS defaults into Stow packages, audit Sequoia compatibility
+- [ ] 01-01-PLAN.md — Restructure repo into Stow packages, add .gitignore and SSH safety ignore, scan for secrets
+- [ ] 01-02-PLAN.md — Replace rsync install.sh with idempotent Stow-based installer
+- [ ] 01-03-PLAN.md — Audit machine state, collaboratively curate Brewfile, integrate brew bundle
+- [ ] 01-04-PLAN.md — Finalize Git config in Stow package, audit macOS defaults for Sequoia compatibility
 
 ### Phase 2: Shell
 **Goal**: The zsh environment loads fast, with clean plugin management via antidote and no Oh My Zsh remnants
