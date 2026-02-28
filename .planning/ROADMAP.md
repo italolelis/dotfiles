@@ -58,7 +58,7 @@ Plans:
 **Requirements**: PLAT-01, PLAT-02, PLAT-03, PLAT-04
 **Success Criteria** (what must be TRUE):
   1. Running install.sh on macOS completes the full setup (Homebrew, Stow, all packages)
-  2. Running install.sh in a Linux container stows only shell and git packages with no errors
+  2. Running install.sh in a Linux container installs shell tools and stows all packages with no errors
   3. Opening a shell in a Cursor devcontainer shows a working Starship prompt with no alias errors
   4. macOS-only aliases (brew, mas, etc.) do not error when run in a Linux container
 **Plans**: TBD
@@ -91,5 +91,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete    | 2026-02-28 |
 | 2. Shell | 3/3 | Complete   | 2026-02-28 |
-| 3. Cross-Platform | 2/2 | Complete   | 2026-02-28 |
+| 3. Cross-Platform | 2/2 | Complete    | 2026-02-28 |
 | 4. Polish | 0/3 | Not started | - |

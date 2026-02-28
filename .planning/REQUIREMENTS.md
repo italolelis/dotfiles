@@ -31,7 +31,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Cross-Platform
 
 - [x] **PLAT-01**: Install script detects platform (macOS vs Linux) and branches accordingly
-- [x] **PLAT-02**: Linux install path: installs stow + stows shell and git packages only
+- [x] **PLAT-02**: Linux install path: installs zsh, stow, antidote, starship, fzf + stows all packages (config degrades gracefully without binaries)
 - [x] **PLAT-03**: `command -v` guards on macOS-specific aliases and functions
 - [x] **PLAT-04**: install.sh compatible with Cursor devcontainers and GitHub Codespaces auto-dotfiles
 
