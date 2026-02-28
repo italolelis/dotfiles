@@ -1,5 +1,6 @@
 # Custom zsh completions
-# This file contains custom completion functions
+# Source this file AFTER antidote loads (after the plugin manager initializes completions).
+# compdef calls here are safe — the plugin manager wraps them to fire at the right time.
 
 # Docker compose completions for 'dc' alias
 _dc() {
@@ -22,13 +23,6 @@ _dc() {
     _describe -t commands 'docker compose commands' subcmds
 }
 
-# Kubernetes context completion for 'kctx' alias
-_kctx() {
-    local -a contexts
-    contexts=($(kubectl config get-contexts -o name 2>/dev/null))
-    _describe -t contexts 'kubernetes contexts' contexts
-}
-
 # Git branch completion for 'gco' and 'gb' aliases
 _git_branch() {
     local -a branches
@@ -46,15 +40,7 @@ _git_branch() {
     _describe -t branches 'git branches' branches
 }
 
-# Register completions after a delay to ensure completion system is loaded
-() {
-    # Wait for completion system to be ready
-    autoload -Uz compinit
-    compinit
-
-    # Register completions
-    compdef _dc dc 2>/dev/null || true
-    compdef _kctx kctx 2>/dev/null || true
-    compdef _git_branch gco 2>/dev/null || true
-    compdef _git_branch gb 2>/dev/null || true
-}
+# Register completions
+compdef _dc dc
+compdef _git_branch gco
+compdef _git_branch gb
