@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-last_updated: "2026-02-28T13:50:32.825Z"
+status: in-progress
+last_updated: "2026-02-28T15:00:00.000Z"
 progress:
-  total_phases: 2
+  total_phases: 4
   completed_phases: 1
   total_plans: 7
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # Project State
@@ -18,16 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-02-28)
 
 **Core value:** One command bootstraps a complete, consistent dev environment on a fresh Mac or Linux container.
-**Current focus:** Phase 2 — Shell
+**Current focus:** Phase 2 — Shell (COMPLETE) — Next: Phase 3 — Editors
 
 ## Current Position
 
-Phase: 2 of 4 (Shell)
-Plan: 2 of 3 in current phase
-Status: In progress
-Last activity: 2026-02-28 — Completed 02-02 (zsh support files cleanup: .path, .exports, .aliases, .functions, .zsh_completions)
+Phase: 2 of 4 (Shell) — COMPLETE
+Plan: 3 of 3 in current phase — COMPLETE
+Status: Phase 2 complete; awaiting Phase 3 planning
+Last activity: 2026-02-28 — Completed 02-03 (shell integration + human end-to-end verification)
 
-Progress: [█████░░░░░] 50%
+Progress: [███████░░░] 62%
 
 ## Performance Metrics
 
@@ -41,10 +41,10 @@ Progress: [█████░░░░░] 50%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Foundation | 1 | 2min | 2min |
-| 2. Shell | 2 | 6min | 3min |
+| 2. Shell | 3 | 16min | 5min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (2min), 02-01 (2min), 02-02 (4min)
+- Last 5 plans: 01-01 (2min), 02-01 (2min), 02-02 (4min), 02-03 (10min)
 - Trend: stable
 
 *Updated after each plan completion*
@@ -78,6 +78,9 @@ Recent decisions affecting current work:
 - [Phase 02-shell]: [02-02]: STARSHIP_CONFIG added to .exports pointing to ~/.starship.toml — wires starship Stow package without restructuring
 - [Phase 02-shell]: [02-02]: .zsh_completions must be sourced AFTER antidote block in .zshrc — plan 02-01 executor must add sourcing line
 - [Phase 02-shell]: [02-02]: update alias simplified to brew-only; PYTHONPATH removed; bash HIST vars removed from .exports
+- [Phase 02-shell]: [02-03]: antidote must be installed via brew on existing machines — Brewfile alone is insufficient until install.sh is run on a fresh machine
+- [Phase 02-shell]: [02-03]: .zsh_completions sourced AFTER antidote block (after source ${zsh_plugins}.zsh) so compdef calls work with ez-compinit
+- [Phase 02-shell]: [02-03]: ll alias was missing from .aliases — added as ls -lah standard shorthand
 
 ### Pending Todos
 
@@ -92,5 +95,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Completed 02-02-PLAN.md
-Resume file: .planning/phases/02-shell/02-03-PLAN.md
+Stopped at: Completed 02-03-PLAN.md (Phase 2 Shell — complete)
+Resume file: .planning/phases/03-editors/ (Phase 3 planning pending)

@@ -11,7 +11,7 @@ Modernize an existing dotfiles repo from rsync-based file copying to a symlink-m
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 1: Foundation** - Stow-based symlink structure, Brewfile audit, Git and macOS defaults configs in place (completed 2026-02-28)
-- [ ] **Phase 2: Shell** - Oh My Zsh removed, antidote plugin manager live, clean zsh load order
+- [x] **Phase 2: Shell** - Oh My Zsh removed, antidote plugin manager live, clean zsh load order (completed 2026-02-28)
 - [ ] **Phase 3: Cross-Platform** - Single install.sh serving macOS and Linux/devcontainers
 - [ ] **Phase 4: Polish** - dot update command, Ghostty config, tmux + TPM
 
@@ -90,6 +90,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete    | 2026-02-28 |
-| 2. Shell | 1/3 | In Progress|  |
+| 2. Shell | 3/3 | Complete   | 2026-02-28 |
 | 3. Cross-Platform | 0/2 | Not started | - |
 | 4. Polish | 0/3 | Not started | - |
