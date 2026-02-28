@@ -57,6 +57,10 @@ if [[ ! ${zsh_plugins}.zsh -nt ${zsh_plugins}.txt ]]; then
 fi
 source ${zsh_plugins}.zsh
 
+# ── 7b. Custom completions ────────────────────────────────────────────────────
+# Must be sourced AFTER antidote/ez-compinit so compdef calls are safe
+[[ -r ~/.zsh_completions ]] && source ~/.zsh_completions
+
 # ── 8. Key bindings ──────────────────────────────────────────────────────────
 # history-substring-search bindings — MUST be after antidote source block
 # Uses terminfo for terminal portability (not hardcoded escape sequences)
