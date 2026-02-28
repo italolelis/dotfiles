@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-last_updated: "2026-02-28T20:11:57.162Z"
+status: in_progress
+last_updated: "2026-02-28T21:09:00Z"
 progress:
-  total_phases: 3
+  total_phases: 4
   completed_phases: 3
-  total_plans: 9
-  completed_plans: 9
+  total_plans: 12
+  completed_plans: 12
 ---
 
 # Project State
@@ -89,6 +89,7 @@ Recent decisions affecting current work:
 - [Phase 03-cross-platform]: [03-02]: One Darwin block per file — all macOS-only aliases grouped at end of .aliases in a single if [[ $(uname -s) == Darwin ]] block; cleaner than scattered guards
 - [Phase 03-cross-platform]: [03-02]: Linux antidote path sources ~/.antidote/antidote.zsh directly (git-clone pattern); [[ -d $HOME/.antidote ]] guard prevents errors before bootstrap
 - [Phase 03-cross-platform]: [03-02]: Starship command -v guard applied as defensive pattern for any optional binary in .zshrc
+- [Phase 04-polish]: dot uses ~/.local/bin (already on PATH via zsh/.path) — no PATH changes needed; antidote update guarded with command -v not IS_MACOS; git pull --ff-only fails cleanly on diverging commits
 
 ### Pending Todos
 
