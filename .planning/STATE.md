@@ -18,14 +18,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-02-28)
 
 **Core value:** One command bootstraps a complete, consistent dev environment on a fresh Mac or Linux container.
-**Current focus:** Phase 1 — Foundation
+**Current focus:** Phase 2 — Shell
 
 ## Current Position
 
-Phase: 1 of 4 (Foundation)
-Plan: 4 of 4 in current phase
-Status: In progress
-Last activity: 2026-02-28 — 01-03 complete (Brewfile curated)
+Phase: 2 of 4 (Shell)
+Plan: 0 of 3 in current phase
+Status: Context gathered
+Last activity: 2026-02-28 — Phase 2 context gathered
 
 Progress: [████░░░░░░] 33%
 
@@ -83,5 +83,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Completed 01-03-PLAN.md — Brewfile curated, old install/Brewfile removed
-Resume file: None
+Stopped at: Phase 2 context gathered
+Resume file: .planning/phases/02-shell/02-CONTEXT.md
