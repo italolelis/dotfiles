@@ -8,7 +8,7 @@ progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 8
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State
@@ -23,18 +23,18 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 3 of 4 (Cross-Platform) — IN PROGRESS
-Plan: 1 of 2 in current phase — COMPLETE
-Status: Phase 3 Plan 01 complete; ready for Plan 02
-Last activity: 2026-02-28 — Completed 03-01 (cross-platform install.sh with platform detection)
+Plan: 2 of 2 in current phase — COMPLETE
+Status: Phase 3 complete (both plans done); ready for Phase 4
+Last activity: 2026-02-28 — Completed 03-02 (platform guards for .zshrc, .aliases, .functions)
 
-Progress: [████████░░] 75%
+Progress: [█████████░] 87%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 3min
-- Total execution time: 0.13 hours
+- Total plans completed: 6
+- Average duration: 5min
+- Total execution time: 0.22 hours
 
 **By Phase:**
 
@@ -42,9 +42,10 @@ Progress: [████████░░] 75%
 |-------|-------|-------|----------|
 | 1. Foundation | 1 | 2min | 2min |
 | 2. Shell | 3 | 16min | 5min |
+| 3. Cross-Platform | 2 | 11min | 5.5min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (2min), 02-01 (2min), 02-02 (4min), 02-03 (10min), 03-01 (1min)
+- Last 5 plans: 02-02 (4min), 02-03 (10min), 03-01 (1min), 03-02 (10min)
 - Trend: stable
 
 *Updated after each plan completion*
@@ -85,6 +86,9 @@ Recent decisions affecting current work:
 - [Phase 03-cross-platform]: [03-01]: stow ALL packages on Linux — config files are lightweight, missing binaries degrade gracefully
 - [Phase 03-cross-platform]: [03-01]: linux_install_antidote uses git clone --depth=1 to ~/.antidote (no Homebrew on Linux)
 - [Phase 03-cross-platform]: [03-01]: apt-get install pattern: check root (id -u eq 0) then sudo fallback then graceful fail — works in devcontainers and servers
+- [Phase 03-cross-platform]: [03-02]: One Darwin block per file — all macOS-only aliases grouped at end of .aliases in a single if [[ $(uname -s) == Darwin ]] block; cleaner than scattered guards
+- [Phase 03-cross-platform]: [03-02]: Linux antidote path sources ~/.antidote/antidote.zsh directly (git-clone pattern); [[ -d $HOME/.antidote ]] guard prevents errors before bootstrap
+- [Phase 03-cross-platform]: [03-02]: Starship command -v guard applied as defensive pattern for any optional binary in .zshrc
 
 ### Pending Todos
 
@@ -99,5 +103,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Completed 03-01-PLAN.md (Phase 3 Cross-Platform — Plan 01 complete)
-Resume file: .planning/phases/03-cross-platform/03-02-PLAN.md
+Stopped at: Completed 03-02-PLAN.md (Phase 3 Cross-Platform — all plans complete)
+Resume file: .planning/phases/04-devcontainer/ (Phase 4 when ready)
