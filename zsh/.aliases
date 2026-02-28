@@ -12,12 +12,6 @@ alias dt="cd ~/Desktop"
 alias p="cd ~/projects"
 alias g="git"
 
-# macOS Finder shortcuts
-alias showfiles="defaults write com.apple.finder AppleShowAllFiles YES; killall Finder"
-alias hidefiles="defaults write com.apple.finder AppleShowAllFiles NO; killall Finder"
-alias showpath="defaults write com.apple.finder _FXShowPosixPathInTitle -bool true; killall Finder"
-alias hidepath="defaults write com.apple.finder _FXShowPosixPathInTitle -bool false; killall Finder"
-
 # Development shortcuts
 alias dc="docker compose"
 alias dcu="docker compose up"
@@ -64,22 +58,8 @@ alias sudo='sudo '
 # Get week number
 alias week='date +%V'
 
-# Update Homebrew packages (Phase 4 dot command will be the full system updater)
-alias update='brew update && brew upgrade && brew cleanup'
-
 # IP addresses
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
-alias localip="ipconfig getifaddr en0"
-alias ips="ifconfig -a | grep -o 'inet6\? \(addr:\)\?\s\?\(\(\([0-9]\+\.\)\{3\}[0-9]\+\)\|[a-fA-F0-9:]\+\)' | awk '{ sub(/inet6? (addr:)? ?/, \"\"); print }'"
-
-# Show active network interfaces
-alias ifactive="ifconfig | pcregrep -M -o '^[^\t:]+:([^\n]|\n\t)*status: active'"
-
-# Flush Directory Service cache
-alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder"
-
-# Clean up LaunchServices to remove duplicates in the "Open With" menu
-alias lscleanup="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user && killall Finder"
 
 # Canonical hex dump; some systems have this symlinked
 command -v hd > /dev/null || alias hd="hexdump -C"
@@ -90,16 +70,8 @@ command -v md5sum > /dev/null || alias md5sum="md5"
 # macOS has no `sha1sum`, so use `shasum` as a fallback
 command -v sha1sum > /dev/null || alias sha1sum="shasum"
 
-# Trim new lines and copy to clipboard
-alias c="tr -d '\n' | pbcopy"
-
 # Recursively delete `.DS_Store` files
 alias cleanup="find . -type f -name '*.DS_Store' -ls -delete"
-
-# Empty the Trash on all mounted volumes and the main HDD.
-# Also, clear Apple's System Logs to improve shell startup speed.
-# Finally, clear download history from quarantine. https://mths.be/bum
-alias emptytrash="sudo rm -rfv /Volumes/*/.Trashes; sudo rm -rfv ~/.Trash; sudo rm -rfv /private/var/log/asl/*.asl; sqlite3 ~/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV* 'delete from LSQuarantineEvent'"
 
 # URL-encode strings
 alias urlencode='python3 -c "import sys, urllib.parse; print(urllib.parse.quote_plus(sys.argv[1]))"'
@@ -114,3 +86,24 @@ alias reload="exec ${SHELL} -l"
 
 # Print each PATH entry on a separate line
 alias path='echo -e ${PATH//:/\\n}'
+
+# ── macOS-only aliases ────────────────────────────────────────────────────────
+if [[ $(uname -s) == Darwin ]]; then
+  # Finder
+  alias showfiles="defaults write com.apple.finder AppleShowAllFiles YES; killall Finder"
+  alias hidefiles="defaults write com.apple.finder AppleShowAllFiles NO; killall Finder"
+  alias showpath="defaults write com.apple.finder _FXShowPosixPathInTitle -bool true; killall Finder"
+  alias hidepath="defaults write com.apple.finder _FXShowPosixPathInTitle -bool false; killall Finder"
+
+  # Networking (macOS-specific)
+  alias localip="ipconfig getifaddr en0"
+  alias ips="ifconfig -a | grep -o 'inet6\? \(addr:\)\?\s\?\(\(\([0-9]\+\.\)\{3\}[0-9]\+\)\|[a-fA-F0-9:]\+\)' | awk '{ sub(/inet6? (addr:)? ?/, \"\"); print }'"
+  alias ifactive="ifconfig | pcregrep -M -o '^[^\t:]+:([^\n]|\n\t)*status: active'"
+  alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder"
+
+  # System
+  alias lscleanup="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user && killall Finder"
+  alias c="tr -d '\n' | pbcopy"
+  alias emptytrash="sudo rm -rfv /Volumes/*/.Trashes; sudo rm -rfv ~/.Trash; sudo rm -rfv /private/var/log/asl/*.asl; sqlite3 ~/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV* 'delete from LSQuarantineEvent'"
+  alias update='brew update && brew upgrade && brew cleanup'
+fi

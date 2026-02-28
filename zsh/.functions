@@ -3,11 +3,6 @@ function mkd() {
 	mkdir -p "$@" && cd "$_";
 }
 
-# Change working directory to the top-most Finder window location
-function cdf() { # short for `cdfinder`
-	cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
-}
-
 # Create a .tar.gz archive, using `zopfli`, `pigz` or `gzip` for compression
 function targz() {
 	local tmpFile="${@%/}.tar";
@@ -192,8 +187,27 @@ function portcheck() {
     fi
 }
 
-# macOS system info
-function sysinfo() {
+# Quick backup function
+function backup() {
+    local source=${1:-.}
+    local dest=${2:-~/backups}
+    local timestamp=$(date +%Y%m%d_%H%M%S)
+    local backup_name="backup_$(basename $source)_$timestamp.tar.gz"
+
+    mkdir -p "$dest"
+    tar -czf "$dest/$backup_name" "$source"
+    echo "Backup created: $dest/$backup_name"
+}
+
+# ── macOS-only functions ──────────────────────────────────────────────────────
+if [[ $(uname -s) == Darwin ]]; then
+  # Change working directory to the top-most Finder window location
+  function cdf() {
+    cd "$(osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)')";
+  }
+
+  # macOS system info
+  function sysinfo() {
     echo "=== macOS System Information ==="
     echo "OS Version: $(sw_vers -productVersion)"
     echo "Build: $(sw_vers -buildVersion)"
@@ -203,16 +217,5 @@ function sysinfo() {
     echo "Memory: $(vm_stat | grep 'Pages free:' | awk '{print $3}' | sed 's/\.//') pages free"
     echo "Disk Usage:"
     df -h / | tail -1
-}
-
-# Quick backup function
-function backup() {
-    local source=${1:-.}
-    local dest=${2:-~/backups}
-    local timestamp=$(date +%Y%m%d_%H%M%S)
-    local backup_name="backup_$(basename $source)_$timestamp.tar.gz"
-    
-    mkdir -p "$dest"
-    tar -czf "$dest/$backup_name" "$source"
-    echo "Backup created: $dest/$backup_name"
-}
+  }
+fi
