@@ -9,7 +9,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Foundation
 
-- [ ] **FOUND-01**: Repo restructured into Stow packages (one dir per tool: zsh/, git/, tmux/, starship/, ghostty/, etc.)
+- [x] **FOUND-01**: Repo restructured into Stow packages (one dir per tool: zsh/, git/, tmux/, starship/, ghostty/, etc.)
 - [ ] **FOUND-02**: Install script uses `stow` to create symlinks instead of rsync file copying
 - [ ] **FOUND-03**: Install script is idempotent (safe to run multiple times)
 
@@ -72,7 +72,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | Phase 1 | Pending |
+| FOUND-01 | Phase 1 | Complete |
 | FOUND-02 | Phase 1 | Pending |
 | FOUND-03 | Phase 1 | Pending |
 | SHEL-01 | Phase 2 | Pending |
