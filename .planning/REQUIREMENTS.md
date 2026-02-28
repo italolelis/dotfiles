@@ -15,12 +15,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Shell
 
-- [ ] **SHEL-01**: Oh My Zsh removed and replaced with antidote plugin manager
-- [ ] **SHEL-02**: Plugins lazy-loaded via antidote (zsh-autosuggestions, zsh-syntax-highlighting)
-- [ ] **SHEL-03**: Single `compinit` call after all fpath additions, correct zsh load order
-- [ ] **SHEL-04**: `typeset -U PATH path` prevents PATH duplication across subshells
+- [x] **SHEL-01**: Oh My Zsh removed and replaced with antidote plugin manager
+- [x] **SHEL-02**: Plugins lazy-loaded via antidote (zsh-autosuggestions, zsh-syntax-highlighting)
+- [x] **SHEL-03**: Single `compinit` call after all fpath additions, correct zsh load order
+- [x] **SHEL-04**: `typeset -U PATH path` prevents PATH duplication across subshells
 - [ ] **SHEL-05**: Starship prompt configured and loaded (already exists, migrate to Stow package)
-- [ ] **SHEL-06**: fzf shell integration (Ctrl+R history search, Ctrl+T file finder)
+- [x] **SHEL-06**: fzf shell integration (Ctrl+R history search, Ctrl+T file finder)
 
 ### Packages
 
@@ -75,12 +75,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FOUND-01 | Phase 1 | Complete |
 | FOUND-02 | Phase 1 | Complete |
 | FOUND-03 | Phase 1 | Complete |
-| SHEL-01 | Phase 2 | Pending |
-| SHEL-02 | Phase 2 | Pending |
-| SHEL-03 | Phase 2 | Pending |
-| SHEL-04 | Phase 2 | Pending |
+| SHEL-01 | Phase 2 | Complete |
+| SHEL-02 | Phase 2 | Complete |
+| SHEL-03 | Phase 2 | Complete |
+| SHEL-04 | Phase 2 | Complete |
 | SHEL-05 | Phase 2 | Pending |
-| SHEL-06 | Phase 2 | Pending |
+| SHEL-06 | Phase 2 | Complete |
 | PKGS-01 | Phase 1 | Complete |
 | PKGS-02 | Phase 1 | Complete |
 | PKGS-03 | Phase 4 | Pending |

@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 2 of 4 (Shell)
-Plan: 0 of 3 in current phase
-Status: Context gathered
-Last activity: 2026-02-28 — Phase 2 context gathered
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-02-28 — Completed 02-01 (antidote migration, .zshrc rewrite)
 
-Progress: [████░░░░░░] 33%
+Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
@@ -41,10 +41,11 @@ Progress: [████░░░░░░] 33%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1. Foundation | 1 | 2min | 2min |
+| 2. Shell | 1 | 2min | 2min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (2min)
-- Trend: -
+- Last 5 plans: 01-01 (2min), 02-01 (2min)
+- Trend: stable
 
 *Updated after each plan completion*
 
@@ -69,6 +70,10 @@ Recent decisions affecting current work:
 - [01-03]: netbird requires tap netbirdio/tap — added to Brewfile
 - [01-03]: brew bundle check fails on current machine (packages not installed) — expected; Brewfile used by install.sh on fresh machines
 - [01-03]: spotify and signal removed; arc, mac-mouse-fix (cask), netbird added per user approval
+- [02-01]: antidote manages zsh-autosuggestions and zsh-syntax-highlighting via GitHub repos — Homebrew formulae removed to prevent version conflicts
+- [02-01]: ez-compinit placed first in .zsh_plugins.txt to prevent double-compinit (RESEARCH Pitfall 1)
+- [02-01]: SSH agent block removed entirely — 1Password SSH agent handles this; Warp block removed — Ghostty is the terminal
+- [02-01]: .zsh_completions excluded from source loop — ez-compinit handles compinit; plan 02-02 will clean up remaining compdef calls
 
 ### Pending Todos
 
@@ -83,5 +88,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Phase 2 context gathered
-Resume file: .planning/phases/02-shell/02-CONTEXT.md
+Stopped at: Completed 02-01-PLAN.md
+Resume file: .planning/phases/02-shell/02-02-PLAN.md
