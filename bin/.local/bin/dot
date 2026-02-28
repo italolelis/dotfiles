@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# ~/.dotfiles/bin/.local/bin/dot — update dotfiles, packages, and plugins
+# Usage: dot
+set -euo pipefail
+
+DOTFILES="$HOME/.dotfiles"
+PACKAGES=(zsh git tmux starship ghostty ssh misc bin)
+
+PLATFORM="$(/usr/bin/uname -s)"
+IS_MACOS=false
+IS_LINUX=false
+case "$PLATFORM" in
+  Darwin) IS_MACOS=true ;;
+  Linux)  IS_LINUX=true ;;
+esac
+
+log()  { echo "  $1"; }
+info() { echo ""; echo "==> $1"; }
+ok()   { echo "  [ok] $1"; }
+
+# 1. Pull latest changes
+info "Pulling dotfiles..."
+git -C "$DOTFILES" pull --ff-only
+ok "git pull"
+
+# 2. Restow all packages (prunes stale symlinks, creates new ones)
+info "Restowing packages..."
+for pkg in "${PACKAGES[@]}"; do
+  if [[ -d "$DOTFILES/$pkg" ]]; then
+    stow --restow --no-folding --target="$HOME" --dir="$DOTFILES" "$pkg"
+    ok "$pkg"
+  fi
+done
+
+# 3. Update antidote plugins (macOS: brew binary; Linux: not a binary command)
+if command -v antidote &>/dev/null; then
+  info "Updating antidote plugins..."
+  antidote update
+  ok "antidote"
+fi
+
+# 4. Update Homebrew (macOS only)
+if $IS_MACOS; then
+  info "Updating Homebrew..."
+  brew update && brew upgrade && brew cleanup
+  ok "brew"
+fi
+
+echo ""
+echo "=============================="
+echo "  dot: done"
+echo "=============================="
