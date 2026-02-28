@@ -45,12 +45,12 @@ Plans:
   3. `echo $PATH` in a new shell shows no duplicate entries
   4. `Ctrl+R` opens fzf history search; `Ctrl+T` opens fzf file finder
   5. `time zsh -i -c exit` completes in under 500ms
-**Plans**: TBD
+**Plans**: 3 plans (2 waves)
 
 Plans:
-- [ ] 02-01: Remove Oh My Zsh, install antidote, migrate plugins to .zsh_plugins.txt
-- [ ] 02-02: Fix zsh load order (path → exports → aliases → functions → extra), compinit once, typeset -U PATH
-- [ ] 02-03: Migrate Starship config to Stow package, add fzf shell integration
+- [ ] 02-01-PLAN.md — Replace Oh My Zsh with antidote, rewrite .zshrc from clean slate, create .zsh_plugins.txt manifest
+- [ ] 02-02-PLAN.md — Clean up shell support files (.path, .exports, .aliases, .functions, .zsh_completions), wire STARSHIP_CONFIG
+- [ ] 02-03-PLAN.md — Re-stow zsh package, integrate plan outputs, end-to-end verification with human checkpoint
 
 ### Phase 3: Cross-Platform
 **Goal**: One install.sh serves a fresh Mac and a Linux devcontainer; the shell works correctly in both environments
