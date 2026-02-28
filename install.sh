@@ -5,7 +5,7 @@ set -euo pipefail
 # Use a fixed constant — do NOT derive from BASH_SOURCE (see RESEARCH.md Pitfall 7)
 DOTFILES="$HOME/.dotfiles"
 BACKUP_DIR="$HOME/.backup/dotfiles_$(date +%Y%m%d_%H%M%S)"
-PACKAGES=(zsh git tmux starship ghostty ssh misc)
+PACKAGES=(zsh git tmux starship ghostty ssh misc bin)
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 log()  { echo "  $1"; }
