@@ -1,30 +1,49 @@
 # Ghostty Terminal Configuration
 # See: https://ghostty.org/docs/config for all options
 
-# Font settings
-font-family = "JetBrains Mono"
-font-size = 13
+# ── Font ──────────────────────────────────────────────────────────────────────
+# JetBrains Mono — installed via Brewfile (font-jetbrains-mono cask)
+# Ghostty has built-in Nerd Font glyph rendering; no patched variant needed
+font-family = JetBrains Mono
+font-size = 14
+font-feature = +liga
+font-feature = +clig
 
-# Window appearance
+# ── Theme ─────────────────────────────────────────────────────────────────────
+# Catppuccin Mocha is bundled into Ghostty — no separate file install needed
+theme = Catppuccin Mocha
+
+# ── Window ────────────────────────────────────────────────────────────────────
 window-padding-x = 8
 window-padding-y = 8
 window-decoration = true
 macos-titlebar-style = tabs
-
-# Theme and colors
-theme = "Monokai Pro"
 background-opacity = 0.95
 
-# Cursor
+# ── Cursor ────────────────────────────────────────────────────────────────────
 cursor-style = block
 cursor-style-blink = false
 
-# Shell integration
+# ── Shell integration ─────────────────────────────────────────────────────────
 shell-integration = zsh
 
-# Performance
+# ── Clipboard ─────────────────────────────────────────────────────────────────
 copy-on-select = true
 
-# Font ligatures
-font-feature = +liga
-font-feature = +clig
+# ── Quick terminal ────────────────────────────────────────────────────────────
+# Global hotkey dropdown terminal — works system-wide even when Ghostty unfocused
+# Requires macOS Accessibility permissions (System Settings → Privacy & Security → Accessibility)
+quick-terminal-position = top
+quick-terminal-screen = main
+quick-terminal-autohide = true
+quick-terminal-animation-duration = 0.2
+keybind = global:cmd+grave_accent=toggle_quick_terminal
+
+# ── Splits and tabs ──────────────────────────────────────────────────────────
+# Supplementary to tmux — tmux is the primary split/pane manager
+keybind = cmd+shift+d=new_split:right
+keybind = cmd+d=new_split:down
+keybind = cmd+shift+h=goto_split:left
+keybind = cmd+shift+l=goto_split:right
+keybind = cmd+shift+k=goto_split:up
+keybind = cmd+shift+j=goto_split:down
