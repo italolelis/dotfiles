@@ -24,8 +24,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Packages
 
-- [ ] **PKGS-01**: Brewfile created with curated list of brews, casks, and taps (audited against current machine, user-approved)
-- [ ] **PKGS-02**: `brew bundle` integrated into macOS install path
+- [x] **PKGS-01**: Brewfile created with curated list of brews, casks, and taps (audited against current machine, user-approved)
+- [x] **PKGS-02**: `brew bundle` integrated into macOS install path
 - [ ] **PKGS-03**: `bin/dot` update command (brew update + antidote update + stow restow)
 
 ### Cross-Platform
@@ -81,8 +81,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SHEL-04 | Phase 2 | Pending |
 | SHEL-05 | Phase 2 | Pending |
 | SHEL-06 | Phase 2 | Pending |
-| PKGS-01 | Phase 1 | Pending |
-| PKGS-02 | Phase 1 | Pending |
+| PKGS-01 | Phase 1 | Complete |
+| PKGS-02 | Phase 1 | Complete |
 | PKGS-03 | Phase 4 | Pending |
 | PLAT-01 | Phase 3 | Pending |
 | PLAT-02 | Phase 3 | Pending |

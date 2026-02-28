@@ -10,7 +10,7 @@ Modernize an existing dotfiles repo from rsync-based file copying to a symlink-m
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Foundation** - Stow-based symlink structure, Brewfile audit, Git and macOS defaults configs in place
+- [x] **Phase 1: Foundation** - Stow-based symlink structure, Brewfile audit, Git and macOS defaults configs in place (completed 2026-02-28)
 - [ ] **Phase 2: Shell** - Oh My Zsh removed, antidote plugin manager live, clean zsh load order
 - [ ] **Phase 3: Cross-Platform** - Single install.sh serving macOS and Linux/devcontainers
 - [ ] **Phase 4: Polish** - dot update command, Ghostty config, tmux + TPM
@@ -27,7 +27,7 @@ Modernize an existing dotfiles repo from rsync-based file copying to a symlink-m
   3. Running `brew bundle check` passes with no missing packages
   4. Git config (signing key, aliases, global gitignore) is loaded and working in a fresh shell
   5. macOS defaults script runs without errors on Sequoia
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 
 Plans:
 - [ ] 01-01-PLAN.md — Restructure repo into Stow packages, add .gitignore and SSH safety ignore, scan for secrets
@@ -89,7 +89,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 3/4 | In Progress|  |
+| 1. Foundation | 4/4 | Complete   | 2026-02-28 |
 | 2. Shell | 0/3 | Not started | - |
 | 3. Cross-Platform | 0/2 | Not started | - |
 | 4. Polish | 0/3 | Not started | - |
