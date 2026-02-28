@@ -13,10 +13,9 @@ brew "unar"
 brew "wget"
 
 # Shell
+brew "antidote"
 brew "starship"
 brew "tmux"
-brew "zsh-autosuggestions"
-brew "zsh-syntax-highlighting"
 
 # Development
 brew "bun"

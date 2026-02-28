@@ -1,0 +1,23 @@
+# Completion init — defer-safe compdef wrapper
+# Must be first: wraps compdef so plugins can call it before compinit runs
+mattmc3/ez-compinit
+
+# OMZ compatibility layer — MUST precede any ohmyzsh/* entries
+getantidote/use-omz
+
+# OMZ git library and plugin (provides gst, gco, gp, gl, gcmsg, etc.)
+ohmyzsh/ohmyzsh path:lib/git.zsh
+ohmyzsh/ohmyzsh path:plugins/git
+
+# Additional completion definitions
+zsh-users/zsh-completions kind:fpath path:src
+
+# Tool completions via OMZ plugins
+ohmyzsh/ohmyzsh path:plugins/gh
+ohmyzsh/ohmyzsh path:plugins/docker
+
+# Core UI plugins — deferred for fast time-to-prompt
+# IMPORTANT: syntax-highlighting MUST come before history-substring-search
+zsh-users/zsh-syntax-highlighting kind:defer
+zsh-users/zsh-autosuggestions kind:defer
+zsh-users/zsh-history-substring-search kind:defer
