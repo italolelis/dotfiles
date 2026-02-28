@@ -50,8 +50,8 @@ require_stow() {
 run_brew_bundle() {
   info "Running brew bundle..."
   if [[ -f "$DOTFILES/Brewfile" ]]; then
-    brew bundle install --file="$DOTFILES/Brewfile" --no-lock
-    ok "Brew bundle complete"
+    brew bundle install --file="$DOTFILES/Brewfile" || log "Some packages failed — review output above"
+    ok "Brew bundle done"
   else
     log "Brewfile not found at $DOTFILES/Brewfile — skipping (will be added in plan 01-03)"
   fi
