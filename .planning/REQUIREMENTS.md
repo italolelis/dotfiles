@@ -30,10 +30,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Cross-Platform
 
-- [ ] **PLAT-01**: Install script detects platform (macOS vs Linux) and branches accordingly
-- [ ] **PLAT-02**: Linux install path: installs stow + stows shell and git packages only
+- [x] **PLAT-01**: Install script detects platform (macOS vs Linux) and branches accordingly
+- [x] **PLAT-02**: Linux install path: installs stow + stows shell and git packages only
 - [ ] **PLAT-03**: `command -v` guards on macOS-specific aliases and functions
-- [ ] **PLAT-04**: install.sh compatible with Cursor devcontainers and GitHub Codespaces auto-dotfiles
+- [x] **PLAT-04**: install.sh compatible with Cursor devcontainers and GitHub Codespaces auto-dotfiles
 
 ### Tool Configs
 
@@ -84,10 +84,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PKGS-01 | Phase 1 | Complete |
 | PKGS-02 | Phase 1 | Complete |
 | PKGS-03 | Phase 4 | Pending |
-| PLAT-01 | Phase 3 | Pending |
-| PLAT-02 | Phase 3 | Pending |
+| PLAT-01 | Phase 3 | Complete |
+| PLAT-02 | Phase 3 | Complete |
 | PLAT-03 | Phase 3 | Pending |
-| PLAT-04 | Phase 3 | Pending |
+| PLAT-04 | Phase 3 | Complete |
 | TOOL-01 | Phase 4 | Pending |
 | TOOL-02 | Phase 4 | Pending |
 | TOOL-03 | Phase 1 | Complete |

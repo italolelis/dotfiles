@@ -5,10 +5,10 @@ milestone_name: milestone
 status: unknown
 last_updated: "2026-02-28T16:27:17.534Z"
 progress:
-  total_phases: 2
+  total_phases: 4
   completed_phases: 2
-  total_plans: 7
-  completed_plans: 7
+  total_plans: 8
+  completed_plans: 8
 ---
 
 # Project State
@@ -18,16 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-02-28)
 
 **Core value:** One command bootstraps a complete, consistent dev environment on a fresh Mac or Linux container.
-**Current focus:** Phase 2 — Shell (COMPLETE) — Next: Phase 3 — Editors
+**Current focus:** Phase 3 — Cross-Platform (in progress)
 
 ## Current Position
 
-Phase: 2 of 4 (Shell) — COMPLETE
-Plan: 3 of 3 in current phase — COMPLETE
-Status: Phase 2 complete; awaiting Phase 3 planning
-Last activity: 2026-02-28 — Completed 02-03 (shell integration + human end-to-end verification)
+Phase: 3 of 4 (Cross-Platform) — IN PROGRESS
+Plan: 1 of 2 in current phase — COMPLETE
+Status: Phase 3 Plan 01 complete; ready for Plan 02
+Last activity: 2026-02-28 — Completed 03-01 (cross-platform install.sh with platform detection)
 
-Progress: [███████░░░] 62%
+Progress: [████████░░] 75%
 
 ## Performance Metrics
 
@@ -44,7 +44,7 @@ Progress: [███████░░░] 62%
 | 2. Shell | 3 | 16min | 5min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (2min), 02-01 (2min), 02-02 (4min), 02-03 (10min)
+- Last 5 plans: 01-01 (2min), 02-01 (2min), 02-02 (4min), 02-03 (10min), 03-01 (1min)
 - Trend: stable
 
 *Updated after each plan completion*
@@ -81,6 +81,10 @@ Recent decisions affecting current work:
 - [Phase 02-shell]: [02-03]: antidote must be installed via brew on existing machines — Brewfile alone is insufficient until install.sh is run on a fresh machine
 - [Phase 02-shell]: [02-03]: .zsh_completions sourced AFTER antidote block (after source ${zsh_plugins}.zsh) so compdef calls work with ez-compinit
 - [Phase 02-shell]: [02-03]: ll alias was missing from .aliases — added as ls -lah standard shorthand
+- [Phase 03-cross-platform]: [03-01]: fzf --bin flag used on Linux — installs binary only, .zshrc handles shell integration via source <(fzf --zsh)
+- [Phase 03-cross-platform]: [03-01]: stow ALL packages on Linux — config files are lightweight, missing binaries degrade gracefully
+- [Phase 03-cross-platform]: [03-01]: linux_install_antidote uses git clone --depth=1 to ~/.antidote (no Homebrew on Linux)
+- [Phase 03-cross-platform]: [03-01]: apt-get install pattern: check root (id -u eq 0) then sudo fallback then graceful fail — works in devcontainers and servers
 
 ### Pending Todos
 
@@ -95,5 +99,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Completed 02-03-PLAN.md (Phase 2 Shell — complete)
-Resume file: .planning/phases/03-editors/ (Phase 3 planning pending)
+Stopped at: Completed 03-01-PLAN.md (Phase 3 Cross-Platform — Plan 01 complete)
+Resume file: .planning/phases/03-cross-platform/03-02-PLAN.md
