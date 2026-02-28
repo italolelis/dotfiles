@@ -1,75 +1,75 @@
-# Load the shell dotfiles, and then some:
-# * ~/.path can be used to extend `$PATH`.
-# * ~/.extra can be used for other settings you don't want to commit.
-for file in ~/.{path,exports,aliases,functions,extra,zsh_completions}; do
-	[ -r "$file" ] && [ -f "$file" ] && source "$file";
-done;
-unset file;
+# ── 1. PATH uniqueness guard ─────────────────────────────────────────────────
+# Must be FIRST, before any PATH modification, at top level (NOT in a function)
+typeset -U PATH path
 
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
+# ── 2. Source dotfiles ────────────────────────────────────────────────────────
+# Load path → exports → aliases → functions → extra (in that order)
+# .zsh_completions is no longer sourced here — ez-compinit handles compinit
+for file in ~/.{path,exports,aliases,functions,extra}; do
+  [[ -r "$file" ]] && source "$file"
+done
+unset file
 
-# Path to your oh-my-zsh installation.
-export ZSH=$HOME/.oh-my-zsh
+# ── 3. Directory stack options ────────────────────────────────────────────────
+# Lightweight OMZ directories.zsh replacement
+setopt AUTO_PUSHD        # cd acts like pushd
+setopt PUSHD_SILENT      # suppress stack output
+setopt PUSHD_IGNORE_DUPS # no duplicate entries
+setopt PUSHD_TO_HOME     # pushd with no args goes home
+DIRSTACKSIZE=20
 
-# Set name of the theme to load --- if set to "random", it will
-# load a random theme each time oh-my-zsh is loaded, in which case,
-# to know which specific one was loaded, run: echo $RANDOM_THEME
-# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-# ZSH_THEME="agnoster"  # Disabled in favor of Starship
-
-# Which plugins would you like to load?
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(git gh zsh-autosuggestions zsh-syntax-highlighting docker kubectl)
-
-# Oh My Zsh settings
-DISABLE_AUTO_UPDATE="false"
-DISABLE_UPDATE_PROMPT="false"
-COMPLETION_WAITING_DOTS="true"
-
-source $ZSH/oh-my-zsh.sh
-
-# Initialize Starship prompt
-eval "$(starship init zsh)"
-
-# Enhanced SSH agent management for macOS Sonoma
-if [ -z "$SSH_AUTH_SOCK" ]; then
-   # Check for a currently running instance of the agent
-   RUNNING_AGENT="`ps -ax | grep 'ssh-agent -s' | grep -v grep | wc -l | tr -d '[:space:]'`"
-   if [ "$RUNNING_AGENT" = "0" ]; then
-        # Launch a new instance of the agent
-        ssh-agent -s &> $HOME/.ssh/ssh-agent
-   fi
-   eval `cat $HOME/.ssh/ssh-agent`
-fi
-
-# Warp terminal integration (replaces iTerm2)
-if [[ "$TERM_PROGRAM" == "WarpTerminal" ]]; then
-    # Warp-specific configurations
-    export WARP_ENABLE_SHELL_INTEGRATION=true
-fi
-
-# macOS Sonoma specific optimizations
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    # Enable Homebrew completions
-    if type brew &>/dev/null; then
-        FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
-        autoload -Uz compinit
-        compinit
-    fi
-
-    # Better performance for large directories
-    zstyle ':completion:*' accept-exact '*(N)'
-    zstyle ':completion:*' use-cache on
-    zstyle ':completion:*' cache-path ~/.zsh/cache
-fi
-
-# Enhanced history settings
+# ── 4. History settings ──────────────────────────────────────────────────────
+HISTSIZE=50000
+SAVEHIST=50000
+HISTFILE=~/.zsh_history
 setopt HIST_IGNORE_ALL_DUPS
 setopt HIST_REDUCE_BLANKS
 setopt HIST_VERIFY
 setopt SHARE_HISTORY
 setopt EXTENDED_HISTORY
+setopt INC_APPEND_HISTORY
+
+# ── 5. Completion styling ─────────────────────────────────────────────────────
+# Replicate OMZ completion appearance: case-insensitive, colored, grouped menu
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
+zstyle ':completion:*' menu select
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path ~/.zsh/cache
+zstyle ':completion:*' accept-exact '*(N)'
+
+# ── 6. Homebrew fpath ─────────────────────────────────────────────────────────
+# Must be before antidote/compinit so Homebrew completions are in fpath
+if type brew &>/dev/null; then
+  fpath=("$(brew --prefix)/share/zsh/site-functions" $fpath)
+fi
+
+# ── 7. antidote plugin bootstrap ──────────────────────────────────────────────
+# Static file pattern: generates .zsh_plugins.zsh once, sources it on every start
+# Only regenerates when .zsh_plugins.txt is newer (saves ~180ms vs antidote load)
+zsh_plugins=${ZDOTDIR:-~}/.zsh_plugins
+[[ -f ${zsh_plugins}.txt ]] || touch ${zsh_plugins}.txt
+fpath=("$(brew --prefix)/opt/antidote/share/antidote/functions" $fpath)
+autoload -Uz antidote
+if [[ ! ${zsh_plugins}.zsh -nt ${zsh_plugins}.txt ]]; then
+  antidote bundle <${zsh_plugins}.txt >|${zsh_plugins}.zsh
+fi
+source ${zsh_plugins}.zsh
+
+# ── 8. Key bindings ──────────────────────────────────────────────────────────
+# history-substring-search bindings — MUST be after antidote source block
+# Uses terminfo for terminal portability (not hardcoded escape sequences)
+bindkey "$terminfo[kcuu1]" history-substring-search-up
+bindkey "$terminfo[kcud1]" history-substring-search-down
+
+# ── 9. fzf shell integration ─────────────────────────────────────────────────
+# Requires fzf >= 0.48.0 (installed via Brewfile)
+# Enables: Ctrl+R (history search), Ctrl+T (file picker), Alt+C (cd into dir)
+if command -v fzf &>/dev/null; then
+  source <(fzf --zsh)
+fi
+
+# ── 10. Starship prompt ──────────────────────────────────────────────────────
+# Always last — prompt init must come after all plugins and completions
+eval "$(starship init zsh)"
