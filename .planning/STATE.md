@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-02-28)
 
 **Core value:** One command bootstraps a complete, consistent dev environment on a fresh Mac or Linux container.
-**Current focus:** Phase 3 — Cross-Platform (in progress)
+**Current focus:** Phase 4 — Polish (in progress)
 
 ## Current Position
 
-Phase: 3 of 4 (Cross-Platform) — IN PROGRESS
-Plan: 2 of 2 in current phase — COMPLETE
-Status: Phase 3 complete (both plans done); ready for Phase 4
-Last activity: 2026-02-28 — Completed 03-02 (platform guards for .zshrc, .aliases, .functions)
+Phase: 4 of 4 (Polish) — IN PROGRESS
+Plan: 3 of 3 in current phase — COMPLETE (awaiting human-verify checkpoint)
+Status: 04-03 task complete; tmux config rewritten — awaiting user verification of tmux session
+Last activity: 2026-02-28 — Completed 04-03 Task 1 (tmux .tmux.conf rewrite with TPM + Catppuccin Mocha)
 
-Progress: [█████████░] 87%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
+- Total plans completed: 10
 - Average duration: 5min
-- Total execution time: 0.22 hours
+- Total execution time: 0.25 hours
 
 **By Phase:**
 
@@ -43,9 +43,10 @@ Progress: [█████████░] 87%
 | 1. Foundation | 1 | 2min | 2min |
 | 2. Shell | 3 | 16min | 5min |
 | 3. Cross-Platform | 2 | 11min | 5.5min |
+| 4. Polish | 3 | ~10min | 3min |
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (4min), 02-03 (10min), 03-01 (1min), 03-02 (10min)
+- Last 5 plans: 02-03 (10min), 03-01 (1min), 03-02 (10min), 04-03 (3min)
 - Trend: stable
 
 *Updated after each plan completion*
@@ -90,6 +91,7 @@ Recent decisions affecting current work:
 - [Phase 03-cross-platform]: [03-02]: Linux antidote path sources ~/.antidote/antidote.zsh directly (git-clone pattern); [[ -d $HOME/.antidote ]] guard prevents errors before bootstrap
 - [Phase 03-cross-platform]: [03-02]: Starship command -v guard applied as defensive pattern for any optional binary in .zshrc
 - [Phase 04-polish]: dot uses ~/.local/bin (already on PATH via zsh/.path) — no PATH changes needed; antidote update guarded with command -v not IS_MACOS; git pull --ff-only fails cleanly on diverging commits
+- [Phase 04-polish]: [04-03]: catppuccin/tmux v2.1.3 pinned and declared BEFORE tmux-resurrect/continuum — prevents status-right overwrite (Pitfall 1); TPM self-bootstrap added; tmux-256color replaces xterm-256color; escape-time 0 eliminates vim insert delay
 
 ### Pending Todos
 
@@ -104,5 +106,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Completed 03-02-PLAN.md (Phase 3 Cross-Platform — all plans complete)
-Resume file: .planning/phases/04-devcontainer/ (Phase 4 when ready)
+Stopped at: Completed 04-03 Task 1 — checkpoint:human-verify for tmux session verification
+Resume file: .planning/phases/04-polish/04-03-PLAN.md (Task 2 — human verification of tmux session)
