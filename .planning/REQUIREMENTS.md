@@ -10,8 +10,8 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Foundation
 
 - [x] **FOUND-01**: Repo restructured into Stow packages (one dir per tool: zsh/, git/, tmux/, starship/, ghostty/, etc.)
-- [ ] **FOUND-02**: Install script uses `stow` to create symlinks instead of rsync file copying
-- [ ] **FOUND-03**: Install script is idempotent (safe to run multiple times)
+- [x] **FOUND-02**: Install script uses `stow` to create symlinks instead of rsync file copying
+- [x] **FOUND-03**: Install script is idempotent (safe to run multiple times)
 
 ### Shell
 
@@ -39,8 +39,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **TOOL-01**: Ghostty config Stow-managed under `.config/ghostty/`
 - [ ] **TOOL-02**: tmux config with TPM plugin manager, tmux-resurrect, tmux-continuum
-- [ ] **TOOL-03**: Git config (signing key, aliases, global gitignore) as Stow package
-- [ ] **TOOL-04**: macOS defaults script audited for Sequoia compatibility
+- [x] **TOOL-03**: Git config (signing key, aliases, global gitignore) as Stow package
+- [x] **TOOL-04**: macOS defaults script audited for Sequoia compatibility
 
 ## v2 Requirements
 
@@ -73,8 +73,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | FOUND-01 | Phase 1 | Complete |
-| FOUND-02 | Phase 1 | Pending |
-| FOUND-03 | Phase 1 | Pending |
+| FOUND-02 | Phase 1 | Complete |
+| FOUND-03 | Phase 1 | Complete |
 | SHEL-01 | Phase 2 | Pending |
 | SHEL-02 | Phase 2 | Pending |
 | SHEL-03 | Phase 2 | Pending |
@@ -90,8 +90,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PLAT-04 | Phase 3 | Pending |
 | TOOL-01 | Phase 4 | Pending |
 | TOOL-02 | Phase 4 | Pending |
-| TOOL-03 | Phase 1 | Pending |
-| TOOL-04 | Phase 1 | Pending |
+| TOOL-03 | Phase 1 | Complete |
+| TOOL-04 | Phase 1 | Complete |
 
 **Coverage:**
 - v1 requirements: 20 total

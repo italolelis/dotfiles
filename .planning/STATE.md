@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-28)
 ## Current Position
 
 Phase: 1 of 4 (Foundation)
-Plan: 1 of 4 in current phase
+Plan: 4 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-28 — 01-01 complete
+Last activity: 2026-02-28 — 01-04 complete
 
-Progress: [█░░░░░░░░░] 8%
+Progress: [████░░░░░░] 33%
 
 ## Performance Metrics
 
@@ -48,6 +48,11 @@ Recent decisions affecting current work:
 - [Init]: Symlinks over rsync — edits in $HOME flow back to repo automatically
 - [01-01]: .stow-local-ignore must NOT be in .gitignore — it needs to be tracked in git to ship the SSH private key safety net with the repo; GNU Stow already ignores its own config files during symlinking
 - [01-01]: gitleaks not yet installed; manual audit confirmed .extra is template-only and .gitconfig signingkey is a public GPG key ID (not a secret)
+- [01-02]: DOTFILES='$HOME/.dotfiles' fixed constant (not BASH_SOURCE): prevents broken behavior when install.sh is run as symlink (RESEARCH.md Pitfall 7)
+- [01-02]: backup_conflicts() uses find+per-file check before stowing: more reliable than parsing stow --simulate output
+- [01-02]: run_brew_bundle() skips gracefully if Brewfile missing: install.sh must work before Brewfile is created in 01-03
+- [01-04]: .macos consolidated into macos.sh; old install-wrapper replaced with standalone Sequoia defaults script; all Tahoe 26.0 Beta references removed
+- [01-04]: osascript target changed from "System Preferences" to "System Settings" (renamed in macOS Ventura+)
 
 ### Pending Todos
 
@@ -62,5 +67,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-28
-Stopped at: Completed 01-01-PLAN.md — Stow package restructure done, ready for 01-02
+Stopped at: Completed 01-04-PLAN.md — Git config verified, macOS defaults cleaned, Phase 1 complete
 Resume file: None
