@@ -93,7 +93,6 @@ Recent decisions affecting current work:
 - [Phase 04-polish]: dot uses ~/.local/bin (already on PATH via zsh/.path) — no PATH changes needed; antidote update guarded with command -v not IS_MACOS; git pull --ff-only fails cleanly on diverging commits
 - [Phase 04-polish]: [04-02]: Catppuccin Mocha is bundled in Ghostty (Title Case, unquoted); quick terminal global hotkey requires Accessibility permission; Ghostty splits are supplementary to tmux; font-family style is unquoted canonical
 - [Phase 04-polish]: [04-03]: catppuccin/tmux v2.1.3 pinned and declared BEFORE tmux-resurrect/continuum — prevents status-right overwrite (Pitfall 1); TPM self-bootstrap added; tmux-256color replaces xterm-256color; escape-time 0 eliminates vim insert delay
-- [Phase 04-polish]: dot uses ~/.local/bin (already on PATH via zsh/.path) — no PATH changes needed; antidote update guarded with command -v not IS_MACOS; git pull --ff-only fails cleanly on diverging commits
 
 ### Pending Todos
 
