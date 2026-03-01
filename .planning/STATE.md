@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: in_progress
-last_updated: "2026-02-28T21:09:00Z"
+status: unknown
+last_updated: "2026-03-01T11:33:58.688Z"
 progress:
   total_phases: 4
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 12
   completed_plans: 12
 ---
@@ -18,14 +18,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-02-28)
 
 **Core value:** One command bootstraps a complete, consistent dev environment on a fresh Mac or Linux container.
-**Current focus:** Phase 4 — Polish (in progress)
+**Current focus:** Phase 4 — Polish (COMPLETE)
 
 ## Current Position
 
-Phase: 4 of 4 (Polish) — IN PROGRESS
-Plan: 3 of 3 in current phase — COMPLETE (awaiting human-verify checkpoint)
-Status: 04-03 task complete; tmux config rewritten — awaiting user verification of tmux session
-Last activity: 2026-02-28 — Completed 04-03 Task 1 (tmux .tmux.conf rewrite with TPM + Catppuccin Mocha)
+Phase: 4 of 4 (Polish) — COMPLETE
+Plan: 3 of 3 in current phase — COMPLETE (human-verify checkpoint approved 2026-03-01)
+Status: 04-03 fully closed — tmux config verified by user; all Phase 4 plans complete
+Last activity: 2026-03-01 — Closed 04-03 after human verification approval
 
 Progress: [██████████] 100%
 
@@ -91,7 +91,9 @@ Recent decisions affecting current work:
 - [Phase 03-cross-platform]: [03-02]: Linux antidote path sources ~/.antidote/antidote.zsh directly (git-clone pattern); [[ -d $HOME/.antidote ]] guard prevents errors before bootstrap
 - [Phase 03-cross-platform]: [03-02]: Starship command -v guard applied as defensive pattern for any optional binary in .zshrc
 - [Phase 04-polish]: dot uses ~/.local/bin (already on PATH via zsh/.path) — no PATH changes needed; antidote update guarded with command -v not IS_MACOS; git pull --ff-only fails cleanly on diverging commits
+- [Phase 04-polish]: [04-02]: Catppuccin Mocha is bundled in Ghostty (Title Case, unquoted); quick terminal global hotkey requires Accessibility permission; Ghostty splits are supplementary to tmux; font-family style is unquoted canonical
 - [Phase 04-polish]: [04-03]: catppuccin/tmux v2.1.3 pinned and declared BEFORE tmux-resurrect/continuum — prevents status-right overwrite (Pitfall 1); TPM self-bootstrap added; tmux-256color replaces xterm-256color; escape-time 0 eliminates vim insert delay
+- [Phase 04-polish]: dot uses ~/.local/bin (already on PATH via zsh/.path) — no PATH changes needed; antidote update guarded with command -v not IS_MACOS; git pull --ff-only fails cleanly on diverging commits
 
 ### Pending Todos
 
@@ -105,6 +107,5 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-28
-Stopped at: Completed 04-03 Task 1 — checkpoint:human-verify for tmux session verification
-Resume file: .planning/phases/04-polish/04-03-PLAN.md (Task 2 — human verification of tmux session)
+Last session: 2026-03-01
+Stopped at: Completed 04-01-PLAN.md — dot command created, human-verify approved; all Phase 4 plans complete

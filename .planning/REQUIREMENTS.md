@@ -26,7 +26,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **PKGS-01**: Brewfile created with curated list of brews, casks, and taps (audited against current machine, user-approved)
 - [x] **PKGS-02**: `brew bundle` integrated into macOS install path
-- [ ] **PKGS-03**: `bin/dot` update command (brew update + antidote update + stow restow)
+- [x] **PKGS-03**: `bin/dot` update command (brew update + antidote update + stow restow)
 
 ### Cross-Platform
 
@@ -37,7 +37,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Tool Configs
 
-- [ ] **TOOL-01**: Ghostty config Stow-managed under `.config/ghostty/`
+- [x] **TOOL-01**: Ghostty config Stow-managed under `.config/ghostty/`
 - [x] **TOOL-02**: tmux config with TPM plugin manager, tmux-resurrect, tmux-continuum
 - [x] **TOOL-03**: Git config (signing key, aliases, global gitignore) as Stow package
 - [x] **TOOL-04**: macOS defaults script audited for Sequoia compatibility
@@ -83,12 +83,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SHEL-06 | Phase 2 | Complete |
 | PKGS-01 | Phase 1 | Complete |
 | PKGS-02 | Phase 1 | Complete |
-| PKGS-03 | Phase 4 | Pending |
+| PKGS-03 | Phase 4 | Complete |
 | PLAT-01 | Phase 3 | Complete |
 | PLAT-02 | Phase 3 | Complete |
 | PLAT-03 | Phase 3 | Complete |
 | PLAT-04 | Phase 3 | Complete |
-| TOOL-01 | Phase 4 | Pending |
+| TOOL-01 | Phase 4 | Complete |
 | TOOL-02 | Phase 4 | Complete |
 | TOOL-03 | Phase 1 | Complete |
 | TOOL-04 | Phase 1 | Complete |
