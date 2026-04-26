@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: MVP
 status: complete
-last_updated: "2026-03-01"
+last_updated: "2026-04-26"
 progress:
   total_phases: 4
   completed_phases: 4
@@ -42,7 +42,13 @@ None.
 - Cursor devcontainer + symlinked install.sh is LOW confidence — test empirically
 - gitleaks not yet in Brewfile — consider adding in future milestone
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260426-gn1 | cship integration — stow package + install.sh wiring | 2026-04-26 | 42dc791 | [260426-gn1-cship-integration](./quick/260426-gn1-cship-integration/) |
+
 ## Session Continuity
 
-Last session: 2026-03-01
-Stopped at: v1.0 milestone completed and archived
+Last session: 2026-04-26
+Stopped at: cship integrated as quick task 260426-gn1; v1.0 milestone remains shipped
