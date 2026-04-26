@@ -5,7 +5,7 @@ set -euo pipefail
 # Use a fixed constant — do NOT derive from BASH_SOURCE (see RESEARCH.md Pitfall 7)
 DOTFILES="$HOME/.dotfiles"
 BACKUP_DIR="$HOME/.backup/dotfiles_$(date +%Y%m%d_%H%M%S)"
-PACKAGES=(zsh git tmux starship ghostty ssh misc bin)
+PACKAGES=(zsh git tmux starship cship ghostty ssh misc bin)
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 log()  { echo "  $1"; }
@@ -137,6 +137,24 @@ linux_install_starship() {
   ok "starship installed to ~/.local/bin"
 }
 
+install_cship() {
+  info "Checking cship..."
+  if command -v cship &>/dev/null; then
+    ok "cship already installed: $(cship --version 2>/dev/null | head -1)"
+    return 0
+  fi
+  log "Installing cship via official installer..."
+  curl -fsSL https://cship.dev/install.sh | bash
+  if ! command -v cship &>/dev/null && [[ -x "$HOME/.local/bin/cship" ]]; then
+    log "cship installed to ~/.local/bin (ensure ~/.local/bin is on PATH)"
+  fi
+  if command -v cship &>/dev/null; then
+    ok "cship installed"
+  else
+    log "[warn] cship install completed but binary not found on PATH — restart shell or check ~/.local/bin"
+  fi
+}
+
 linux_install_fzf() {
   info "Checking fzf (Linux)..."
   if command -v fzf &>/dev/null; then
@@ -223,12 +241,14 @@ main() {
     install_homebrew
     require_stow
     run_brew_bundle
+    install_cship
   elif $IS_LINUX; then
     linux_require_zsh
     linux_require_stow
     linux_install_antidote
     linux_install_starship
     linux_install_fzf
+    install_cship
   fi
 
   stow_packages
