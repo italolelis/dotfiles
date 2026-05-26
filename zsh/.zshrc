@@ -87,3 +87,18 @@ fi
 if command -v starship &>/dev/null; then
   eval "$(starship init zsh)"
 fi
+
+# ── 11. Local-only overrides (untracked) ─────────────────────────────────────
+# Put machine-specific secrets / tokens / work config here, NOT in .extra
+[[ -r ~/.localrc ]] && source ~/.localrc
+
+# Hermes Agent — runs against the gateway container on oracle (Docker Swarm).
+# Default invocation drops into `hermes chat`; pass any other subcommand:
+#   hermes                 # interactive chat
+#   hermes chat --tui      # modern TUI
+#   hermes sessions list
+#   hermes config show
+#   hermes skills list
+hermes() {
+  ssh -t ivietro@192.168.50.5 "docker exec -it --user 10000 -e HOME=/opt/data -w /opt/data \$(docker ps -q --filter name=hermes_hermes.1 | head -1) /opt/hermes/.venv/bin/hermes ${@:-chat}"
+}

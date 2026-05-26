@@ -1,51 +1,73 @@
-## Introduction
+# Dotfiles
 
-This repository serves as my way to help me setup and maintain my Mac. It takes the effort out of installing everything manually. Everything needed to install my preferred setup of macOS is detailed in this readme.
+My macOS (and Linux fallback) setup, managed with [GNU Stow](https://www.gnu.org/software/stow/) and a [`Brewfile`](./Brewfile).
 
-## A Fresh macOS Setup
+## One-shot install
 
-These instructions are for when you've already set up your dotfiles. If you want to get started with your own dotfiles you can [find instructions below](#your-own-dotfiles).
+On a fresh Mac (after installing Xcode CLT — happens automatically the first time you run `git`):
 
-### Before you re-install
+```zsh
+git clone https://github.com/italolelis/dotfiles.git ~/.dotfiles && ~/.dotfiles/install.sh --force
+```
 
-First, go through the checklist below to make sure you didn't forget anything before you wipe your hard drive.
+That single command will:
 
-- Did you commit and push any changes/branches to your git repositories?
-- Did you remember to save all important documents from non-iCloud directories?
-- Did you save all of your work from apps that aren't synced through iCloud?
-- Did you remember to export important data from your local database?
-- Did you update [mackup](https://github.com/lra/mackup) to the latest version and run `mackup backup`?
+1. Install Homebrew if missing
+2. Install GNU Stow
+3. Run `brew bundle` against [`Brewfile`](./Brewfile) (CLI tools + casks)
+4. Install [`cship`](https://cship.dev)
+5. Stow every package (`zsh`, `git`, `tmux`, `starship`, `cship`, `cmux`, `ssh`, `misc`, `bin`) into `$HOME`, backing up any conflicting regular files to `~/.backup/dotfiles_<timestamp>/`
 
-### Installing macOS cleanly
+After it finishes, restart your shell (or `source ~/.zshrc`).
 
-After going through our checklist above and making sure you backed everything up, we're going to cleanly install macOS with the latest release. Follow [this article](https://www.imore.com/how-do-clean-install-macos) to cleanly install the latest macOS version.
+## Post-install
 
-### Setting up your Mac
+- **macOS defaults** — run once, reboot after:
 
-If you did all of the above you may now follow these installations instructions to setup a new Mac.
+  ```zsh
+  ~/.dotfiles/macos.sh
+  ```
 
-1. Update macOS to the latest version with the App Store
-2. [Generate a new public and private SSH key](https://docs.github.com/en/github/authenticating-to-github/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) by running:
+- **SSH key for GitHub** — generate and add to your account:
 
-   ```zsh
-   curl https://raw.githubusercontent.com/italolelis/dotfiles/HEAD/ssh.sh | sh -s "<your-email-address>"
-   ```
+  ```zsh
+  ssh-keygen -t ed25519 -C "you@example.com"
+  gh auth login        # or paste ~/.ssh/id_ed25519.pub into GitHub manually
+  ```
 
-3. Clone this repo to `~/.dotfiles` with:
+  Then switch the dotfiles remote to SSH:
 
-    ```zsh
-    git clone git@github.com:italolelis/dotfiles.git ~/.dotfiles
-    ```
+  ```zsh
+  git -C ~/.dotfiles remote set-url origin git@github.com:italolelis/dotfiles.git
+  ```
 
-4. Run the installation with:
+- **Local-only secrets** — put env vars, tokens, work-specific config into `~/.localrc` (sourced by `~/.zshrc` if present). **Never** put secrets in `zsh/.extra` — that file is tracked in this repo.
 
-    ```zsh
-    ~/.dotfiles/install.sh
-    ```
+## Layout
 
-5. After mackup is synced with your cloud storage, restore preferences by running `mackup restore`
-6. Restart your computer to finalize the process
+```
+zsh/        .zshrc, .aliases, .exports, .functions, .path, .extra, completions, antidote plugins
+git/        .gitconfig, .gitignore_global
+tmux/       .tmux.conf
+starship/   starship.toml
+cship/      cship config (Claude Code statusline)
+cmux/       cmux config (Ghostty-based terminal)
+ssh/        ~/.ssh/config (no keys)
+misc/       miscellaneous dotfiles
+bin/        ~/.local/bin scripts
+Brewfile    brew + cask package manifest
+install.sh  idempotent installer (macOS + Linux)
+macos.sh    macOS system defaults (run manually)
+```
 
-Your Mac is now ready to use!
+## Updating
 
-> 💡 You can use a different location than `~/.dotfiles` if you want. Make sure you also update the reference in the [`.zshrc`](./.zshrc#L2) file.
+```zsh
+cd ~/.dotfiles && git pull && ./install.sh --force
+```
+
+`install.sh` is idempotent — it uses `stow --restow` so re-running is safe.
+
+## Linux
+
+`install.sh` also runs on Debian/Ubuntu: installs `zsh`, `stow`, `antidote`, `starship`, `fzf`, and `cship` without Homebrew. Casks are skipped.
