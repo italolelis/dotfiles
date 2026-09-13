@@ -16,8 +16,8 @@ That single command will:
 2. Install GNU Stow
 3. Run `brew bundle` against [`Brewfile`](./Brewfile) (CLI tools + casks)
 4. Install [`cship`](https://cship.dev)
-5. Install [`pi`](https://github.com/earendil-works/pi-coding-agent) and every extension listed in [`pi/packages.txt`](./pi/packages.txt)
-6. Stow every package (`zsh`, `git`, `tmux`, `starship`, `cship`, `cmux`, `ssh`, `misc`, `bin`) into `$HOME`, backing up any conflicting regular files to `~/.backup/dotfiles_<timestamp>/`
+5. Stow every package (`zsh`, `git`, `tmux`, `starship`, `cship`, `cmux`, `pi`, `ssh`, `misc`, `bin`) into `$HOME`, backing up any conflicting regular files to `~/.backup/dotfiles_<timestamp>/`
+6. Install [`pi`](https://github.com/earendil-works/pi-coding-agent) plus every extension listed in the now-stowed `~/.pi/agent/settings.json`
 
 After it finishes, restart your shell (or `source ~/.zshrc`).
 
@@ -42,15 +42,11 @@ After it finishes, restart your shell (or `source ~/.zshrc`).
   git -C ~/.dotfiles remote set-url origin git@github.com:italolelis/dotfiles.git
   ```
 
-- **pi extensions** — the installer reads [`pi/packages.txt`](./pi/packages.txt) and runs `pi install <spec>` for anything missing, so a fresh machine gets the same extension set. It never touches packages that are already installed.
+- **pi** — `pi/.pi/agent/settings.json` is stowed to `~/.pi/agent/settings.json` and carries the package list, theme, and default model. The installer parses it and runs `pi install <spec>` for anything missing, so a fresh machine gets the same setup. Custom extensions (e.g. the Claude Code-style status line) live in `pi/.pi/agent/extensions/`.
 
-  After adding or removing an extension locally, print the current set and reconcile the manifest by hand (the file has a comment header worth keeping):
+  Since the settings file is a symlink into this repo, `pi install` / `pi remove` edit the tracked file directly — extension changes show up in `git status`. Keep specs unversioned so `pi update --extensions` can move them forward.
 
-  ```zsh
-  pi list | grep -oE '(npm|git|https?):[^ ]+'
-  ```
-
-  Keep specs unversioned so `pi update --extensions` can keep them current.
+  `~/.pi/agent/auth.json` and `~/.pi/agent/mcp.json` hold live credentials and are **never** tracked.
 
 - **Local-only secrets** — put env vars, tokens, work-specific config into `~/.localrc` (sourced by `~/.zshrc` if present). **Never** put secrets in `zsh/.extra` — that file is tracked in this repo.
 
@@ -63,7 +59,7 @@ tmux/       .tmux.conf
 starship/   starship.toml
 cship/      cship config (Claude Code statusline)
 cmux/       cmux config (~/.config/cmux/cmux.json) — the only terminal managed here
-pi/         packages.txt — pi extension manifest (read by install.sh, not stowed)
+pi/         pi config: settings.json (theme, model, packages) + custom extensions
 ssh/        ~/.ssh/config (no keys)
 misc/       miscellaneous dotfiles
 bin/        ~/.local/bin scripts

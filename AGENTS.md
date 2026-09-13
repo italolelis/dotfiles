@@ -15,10 +15,9 @@ So: to add `~/.config/foo/bar.toml`, create `foo/.config/foo/bar.toml` and add `
 to the `PACKAGES` arrays. Never create a file directly in `$HOME` and never write to a
 path that is already a symlink into this repo — edit the file here instead.
 
-Stowed packages: `zsh git tmux starship cship cmux ssh misc bin`
+Stowed packages: `zsh git tmux starship cship cmux pi ssh misc bin`
 
-Not stowed: `pi/` (a manifest read by `install.sh`), `Brewfile`, `install.sh`,
-`macos.sh`.
+Not stowed: `Brewfile`, `install.sh`, `macos.sh`.
 
 ## Setup and check commands
 
@@ -50,7 +49,7 @@ cmux/       .config/cmux/cmux.json — cmux is the only terminal managed here
 ssh/        ~/.ssh/config only — never keys
 misc/       .curlrc, .editorconfig, .inputrc, .wgetrc
 bin/        ~/.local/bin scripts (currently `dot`)
-pi/         packages.txt — pi extension manifest, read by install.sh, NOT stowed
+pi/         .pi/agent/settings.json + extensions/ — pi config and custom extensions
 Brewfile    brew + cask manifest
 install.sh  idempotent installer (macOS + Linux)
 macos.sh    macOS system defaults — run manually, needs a reboot
@@ -113,13 +112,27 @@ Do not commit unless asked. This repo frequently carries unrelated uncommitted
 changes — some machine-generated (Rancher Desktop appends a PATH block to `.zshrc`).
 Check `git status` and stage deliberately rather than using `git commit -a`.
 
-## Adding a pi extension
+## pi configuration
 
-`pi/packages.txt` mirrors the `packages` array in `~/.pi/agent/settings.json`.
-`install.sh` reads it and runs `pi install <spec>` only for entries not already
-present. Keep specs unversioned so `pi update --extensions` can move them forward.
-After changing extensions locally, reconcile the file by hand:
+`pi/.pi/agent/settings.json` is stowed to `~/.pi/agent/settings.json` and is the
+**single source of truth** for the package list, theme, and default model. There is
+no separate manifest to keep in sync — `install_pi_packages` in `install.sh` parses
+that file (with `node`, not `jq`, so the Linux path needs no extra dependency) and
+runs `pi install <spec>` only for packages not already present.
 
-```bash
-pi list | grep -oE '(npm|git|https?):[^ ]+'
-```
+Because it is a symlink into this repo, `pi install` and `pi remove` edit the tracked
+file directly. That is deliberate: extension changes show up in `git status` instead
+of silently diverging. It also means **pi writes to the repo on its own** —
+`lastChangelogVersion` bumps on version upgrades and will appear as a stray diff.
+Commit or discard it; it is not a conflict.
+
+`install_pi` runs *after* `stow_packages` in `main()`. Keep that order: it ensures
+`pi install` records new packages in the tracked settings file rather than in one
+that stow is about to replace.
+
+Custom extensions are plain `.ts` files in `pi/.pi/agent/extensions/`. Drop a file in
+and it is picked up — no registration step.
+
+**Never track `~/.pi/agent/auth.json` or `~/.pi/agent/mcp.json`.** Both hold live
+credentials (OAuth tokens and MCP server secrets). They stay local, untracked, and
+outside the `pi` stow package. This repo is public.

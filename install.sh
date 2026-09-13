@@ -5,8 +5,10 @@ set -euo pipefail
 # Use a fixed constant — do NOT derive from BASH_SOURCE (see RESEARCH.md Pitfall 7)
 DOTFILES="$HOME/.dotfiles"
 BACKUP_DIR="$HOME/.backup/dotfiles_$(date +%Y%m%d_%H%M%S)"
-PACKAGES=(zsh git tmux starship cship cmux ssh misc bin)
-PI_PACKAGE_MANIFEST="$DOTFILES/pi/packages.txt"
+PACKAGES=(zsh git tmux starship cship cmux pi ssh misc bin)
+# Single source of truth for pi's extension list, theme, and default model.
+# Read straight from the repo so it works before the pi package is stowed.
+PI_SETTINGS="$DOTFILES/pi/.pi/agent/settings.json"
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 log()  { echo "  $1"; }
@@ -180,22 +182,30 @@ install_pi() {
   install_pi_packages
 }
 
-# Install every extension listed in pi/packages.txt that isn't already present.
-# Idempotent: packages already installed are left untouched (no version churn).
+# Install every package listed in the tracked settings.json that isn't already
+# present. Idempotent: existing packages are left untouched (no version churn).
 install_pi_packages() {
-  if [[ ! -f "$PI_PACKAGE_MANIFEST" ]]; then
-    log "No pi manifest at $PI_PACKAGE_MANIFEST — skipping extensions"
+  if [[ ! -f "$PI_SETTINGS" ]]; then
+    log "No pi settings at $PI_SETTINGS — skipping extensions"
     return 0
   fi
   command -v pi &>/dev/null || return 0
 
-  local installed spec
+  local installed spec specs
   installed="$(pi list 2>/dev/null | sed 's/^[[:space:]]*//' || true)"
 
+  # node is guaranteed here (pi itself is an npm package), so use it rather
+  # than adding a jq dependency to the Linux path.
+  if ! specs="$(node -e '
+    const fs = require("node:fs");
+    const s = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+    for (const p of s.packages || []) console.log(p);
+  ' "$PI_SETTINGS" 2>/dev/null)"; then
+    log "[warn] could not parse $PI_SETTINGS — skipping extensions"
+    return 0
+  fi
+
   while IFS= read -r spec || [[ -n "$spec" ]]; do
-    spec="${spec%%#*}"
-    spec="${spec#"${spec%%[![:space:]]*}"}"
-    spec="${spec%"${spec##*[![:space:]]}"}"
     [[ -n "$spec" ]] || continue
 
     if grep -qxF "$spec" <<<"$installed"; then
@@ -208,7 +218,7 @@ install_pi_packages() {
         log "[warn] failed to install pi extension: $spec"
       fi
     fi
-  done < "$PI_PACKAGE_MANIFEST"
+  done <<<"$specs"
 }
 
 linux_install_fzf() {
@@ -298,7 +308,6 @@ main() {
     require_stow
     run_brew_bundle
     install_cship
-    install_pi
   elif $IS_LINUX; then
     linux_require_zsh
     linux_require_stow
@@ -306,10 +315,14 @@ main() {
     linux_install_starship
     linux_install_fzf
     install_cship
-    install_pi
   fi
 
   stow_packages
+
+  # After stowing: ~/.pi/agent/settings.json is a symlink into this repo by
+  # now, so `pi install` records new packages in the tracked file rather than
+  # in one that stow is about to replace.
+  install_pi
 
   echo ""
   echo "=============================="
