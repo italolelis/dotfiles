@@ -1,0 +1,14 @@
+{
+  "packages": [
+    "npm:pi-mcp-adapter",
+    "npm:pi-web-access",
+    "npm:pi-subagents",
+    "npm:@juicesharp/rpiv-ask-user-question",
+    "npm:pi-cmux",
+    "npm:pi-cc-extensions"
+  ],
+  "lastChangelogVersion": "0.85.1",
+  "theme": "cc-dark",
+  "defaultProvider": "anthropic",
+  "defaultModel": "claude-opus-5"
+}
