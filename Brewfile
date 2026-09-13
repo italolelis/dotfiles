@@ -1,6 +1,3 @@
-# Taps
-tap "netbirdio/tap"
-
 # CLI Tools
 brew "coreutils"
 brew "fzf"
@@ -30,7 +27,6 @@ brew "shellcheck"
 brew "uv"
 
 # Apps
-cask "1password"
 cask "arc"
 cask "discord"
 cask "cmux"
@@ -38,9 +34,8 @@ cask "gpg-suite"
 cask "insomnia"
 cask "mac-mouse-fix"
 cask "maccy"
-cask "netbird-ui"
-brew "netbirdio/tap/netbird"
-cask "nordvpn"
+cask "proton-pass"
+cask "protonvpn"
 cask "rectangle"
 cask "tableplus"
 
