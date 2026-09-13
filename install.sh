@@ -6,6 +6,7 @@ set -euo pipefail
 DOTFILES="$HOME/.dotfiles"
 BACKUP_DIR="$HOME/.backup/dotfiles_$(date +%Y%m%d_%H%M%S)"
 PACKAGES=(zsh git tmux starship cship cmux ssh misc bin)
+PI_PACKAGE_MANIFEST="$DOTFILES/pi/packages.txt"
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 log()  { echo "  $1"; }
@@ -155,6 +156,61 @@ install_cship() {
   fi
 }
 
+# ── pi (coding agent) ──────────────────────────────────────────────────────────
+install_pi() {
+  info "Checking pi..."
+  if ! command -v npm &>/dev/null; then
+    log "[warn] npm not found — skipping pi (install node first)"
+    return 0
+  fi
+
+  if command -v pi &>/dev/null; then
+    ok "pi already installed: $(pi --version 2>/dev/null | head -1)"
+  else
+    log "Installing pi via npm..."
+    npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+    if command -v pi &>/dev/null; then
+      ok "pi installed"
+    else
+      log "[warn] pi not on PATH after install — check your npm global bin dir"
+      return 0
+    fi
+  fi
+
+  install_pi_packages
+}
+
+# Install every extension listed in pi/packages.txt that isn't already present.
+# Idempotent: packages already installed are left untouched (no version churn).
+install_pi_packages() {
+  if [[ ! -f "$PI_PACKAGE_MANIFEST" ]]; then
+    log "No pi manifest at $PI_PACKAGE_MANIFEST — skipping extensions"
+    return 0
+  fi
+  command -v pi &>/dev/null || return 0
+
+  local installed spec
+  installed="$(pi list 2>/dev/null | sed 's/^[[:space:]]*//' || true)"
+
+  while IFS= read -r spec || [[ -n "$spec" ]]; do
+    spec="${spec%%#*}"
+    spec="${spec#"${spec%%[![:space:]]*}"}"
+    spec="${spec%"${spec##*[![:space:]]}"}"
+    [[ -n "$spec" ]] || continue
+
+    if grep -qxF "$spec" <<<"$installed"; then
+      ok "pi extension present: $spec"
+    else
+      log "Installing pi extension: $spec"
+      if pi install "$spec"; then
+        ok "pi extension installed: $spec"
+      else
+        log "[warn] failed to install pi extension: $spec"
+      fi
+    fi
+  done < "$PI_PACKAGE_MANIFEST"
+}
+
 linux_install_fzf() {
   info "Checking fzf (Linux)..."
   if command -v fzf &>/dev/null; then
@@ -242,6 +298,7 @@ main() {
     require_stow
     run_brew_bundle
     install_cship
+    install_pi
   elif $IS_LINUX; then
     linux_require_zsh
     linux_require_stow
@@ -249,6 +306,7 @@ main() {
     linux_install_starship
     linux_install_fzf
     install_cship
+    install_pi
   fi
 
   stow_packages
