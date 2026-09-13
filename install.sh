@@ -170,7 +170,13 @@ install_pi() {
     ok "pi already installed: $(pi --version 2>/dev/null | head -1)"
   else
     log "Installing pi via npm..."
-    npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+    # zsh/.exports sets npm_config_prefix, but this script runs under bash and
+    # never sources it - without this, npm would install into Homebrew's prefix
+    # while ~/.npm-global/bin sits first on the zsh PATH, so a later `npm i -g`
+    # from an interactive shell would silently shadow this install.
+    npm_config_prefix="$HOME/.npm-global" \
+      npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+    export PATH="$HOME/.npm-global/bin:$PATH"
     if command -v pi &>/dev/null; then
       ok "pi installed"
     else
