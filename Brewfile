@@ -9,6 +9,11 @@ brew "tree"
 brew "unar"
 brew "wget"
 
+# Proton Pass CLI: agents fetch secrets through it (agent-kit's proton-pass skill) as a
+# scoped, audited agent token. `pass-cli update` doesn't apply to brew installs; brew upgrades it.
+tap "protonpass/tap"
+brew "protonpass/tap/pass-cli"
+
 # Shell
 brew "antidote"
 brew "starship"
