@@ -295,6 +295,88 @@ stow_packages() {
   done
 }
 
+# ── Proton Pass SSH agent ──────────────────────────────────────────────────────
+# SSH keys live in the Proton Pass vault "SSH Keys". pass-cli serves them on
+# ~/.ssh/proton-pass-agent.sock, which ssh/.ssh/config (IdentityAgent) and
+# zsh/.exports (SSH_AUTH_SOCK) point at. It needs `pass-cli login` once.
+install_proton_ssh_agent() {
+  info "Checking Proton Pass SSH agent..."
+  local pass_cli
+  if ! pass_cli="$(command -v pass-cli)"; then
+    log "pass-cli not installed — skipping (the Brewfile installs it)"
+    return 0
+  fi
+  local vault="SSH Keys"
+  local socket="$HOME/.ssh/proton-pass-agent.sock"
+  if $IS_MACOS; then
+    local label="me.proton.pass-cli.ssh-agent"
+    local plist="$HOME/Library/LaunchAgents/$label.plist"
+    if launchctl print "gui/$(id -u)/$label" &>/dev/null; then
+      ok "SSH agent already running ($label)"
+    else
+      mkdir -p "$(dirname "$plist")"
+      # ThrottleInterval: before `pass-cli login` the agent exits at once, and
+      # KeepAlive would otherwise restart it every ten seconds.
+      cat >"$plist" <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>$label</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>$pass_cli</string>
+    <string>ssh-agent</string>
+    <string>start</string>
+    <string>--vault-name</string>
+    <string>$vault</string>
+    <string>--socket-path</string>
+    <string>$socket</string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <true/>
+  <key>ThrottleInterval</key>
+  <integer>60</integer>
+  <key>StandardOutPath</key>
+  <string>$HOME/.ssh/proton-pass-agent.log</string>
+  <key>StandardErrorPath</key>
+  <string>$HOME/.ssh/proton-pass-agent.log</string>
+</dict>
+</plist>
+EOF
+      launchctl bootstrap "gui/$(id -u)" "$plist"
+      ok "SSH agent starts at login ($label)"
+    fi
+  elif $IS_LINUX && command -v systemctl &>/dev/null; then
+    local unit="proton-pass-ssh-agent.service"
+    if systemctl --user is-enabled "$unit" &>/dev/null; then
+      ok "SSH agent already enabled ($unit)"
+    else
+      mkdir -p "$HOME/.config/systemd/user"
+      cat >"$HOME/.config/systemd/user/$unit" <<EOF
+[Unit]
+Description=Proton Pass SSH agent
+
+[Service]
+ExecStart=$pass_cli ssh-agent start --vault-name "$vault" --socket-path $socket
+Restart=on-failure
+RestartSec=60
+
+[Install]
+WantedBy=default.target
+EOF
+      systemctl --user enable --now "$unit"
+      ok "SSH agent starts at login ($unit)"
+    fi
+  fi
+  if ! "$pass_cli" info &>/dev/null; then
+    log "[warn] pass-cli is not logged in: run \`pass-cli login\`; the agent serves no keys until then"
+  fi
+}
+
 # ── Main ───────────────────────────────────────────────────────────────────────
 main() {
   echo ""
@@ -324,6 +406,7 @@ main() {
   fi
 
   stow_packages
+  install_proton_ssh_agent
 
   # After stowing: ~/.pi/agent/settings.json is a symlink into this repo by
   # now, so `pi install` records new packages in the tracked file rather than

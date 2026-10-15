@@ -1,7 +1,9 @@
 [user]
 	email = 1108049+italolelis@users.noreply.github.com
 	name = italolelis
-	signingkey = 5CB8AEE431026C4C
+	# SSH signing (2026-10-15): the key lives in Proton Pass and its SSH agent signs.
+	# Was GPG key 5CB8AEE431026C4C; gpg.program stays so older commits still verify.
+	signingkey = key::ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJFQBDvnn/NO1NYHE4EWd8Gqw7xR7lqSRTxkHyHVwytr
 
 [github]
 	user = italolelis
@@ -23,7 +25,11 @@
 	helper = osxkeychain
 
 [gpg]
+	format = ssh
 	program = gpg
+[gpg "ssh"]
+	# Lets `git log --show-signature` verify our own SSH signatures.
+	allowedSignersFile = ~/.config/git/allowed_signers
 
 [commit]
 	gpgsign = true

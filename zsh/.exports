@@ -10,6 +10,12 @@ export EDITOR="cursor"
 export VISUAL="cursor"
 export PAGER="less"
 
+# SSH agent: Proton Pass (pass-cli ssh-agent; ssh itself finds it through
+# IdentityAgent in ~/.ssh/config). Exported for tools that read SSH_AUTH_SOCK
+# directly, like ssh-add and git's SSH signing, and only while the socket exists,
+# so the system agent stays the fallback.
+[[ -S "$HOME/.ssh/proton-pass-agent.sock" ]] && export SSH_AUTH_SOCK="$HOME/.ssh/proton-pass-agent.sock"
+
 # Starship prompt config location (wires starship/.starship.toml Stow package)
 export STARSHIP_CONFIG="$HOME/.starship.toml"
 
