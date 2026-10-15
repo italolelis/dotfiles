@@ -16,7 +16,7 @@ That single command will:
 2. Install GNU Stow
 3. Run `brew bundle` against [`Brewfile`](./Brewfile) (CLI tools + casks)
 4. Install [`cship`](https://cship.dev)
-5. Stow every package (`zsh`, `git`, `tmux`, `starship`, `cship`, `cmux`, `pi`, `ssh`, `misc`, `bin`) into `$HOME`, backing up any conflicting regular files to `~/.backup/dotfiles_<timestamp>/`
+5. Stow every package (`zsh`, `git`, `tmux`, `starship`, `cship`, `cmux`, `k9s`, `pi`, `ssh`, `misc`, `bin`) into `$HOME`, backing up any conflicting regular files to `~/.backup/dotfiles_<timestamp>/`
 6. Install [`pi`](https://github.com/earendil-works/pi-coding-agent) plus every extension listed in the now-stowed `~/.pi/agent/settings.json`
 
 After it finishes, restart your shell (or `source ~/.zshrc`).
@@ -59,6 +59,7 @@ tmux/       .tmux.conf
 starship/   starship.toml
 cship/      cship config (Claude Code statusline)
 cmux/       cmux config (~/.config/cmux/cmux.json) — the only terminal managed here
+k9s/        k9s config (~/.config/k9s) — homelab k3s: skin, hotkeys, flux/stern plugins
 pi/         pi config: settings.json (theme, model, packages) + custom extensions
 ssh/        ~/.ssh/config (no keys)
 misc/       miscellaneous dotfiles

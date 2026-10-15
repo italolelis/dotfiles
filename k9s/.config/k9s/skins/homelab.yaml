@@ -1,0 +1,108 @@
+# k9s skin: homelab
+#
+# `default` means "whatever the terminal already uses", so backgrounds stay
+# transparent and this follows the cmux theme instead of painting over it —
+# the same skin is readable on a light and a dark profile.
+#
+# Colours are a Catppuccin-ish accent set chosen so the three states you scan
+# for are distinguishable at a glance without reading the text:
+#   green  = healthy / completed      yellow = pending / modified
+#   red    = error / killed           blue   = selection and chrome
+k9s:
+  body:
+    fgColor: &fg lightskyblue
+    bgColor: &bg default
+    logoColor: &accent darkcyan
+
+  prompt:
+    fgColor: *fg
+    bgColor: *bg
+    suggestColor: darkcyan
+
+  info:
+    fgColor: darkcyan
+    sectionColor: *fg
+
+  dialog:
+    fgColor: *fg
+    bgColor: *bg
+    buttonFgColor: black
+    buttonBgColor: darkcyan
+    buttonFocusFgColor: black
+    buttonFocusBgColor: mediumspringgreen
+    labelFgColor: orange
+    fieldFgColor: *fg
+
+  frame:
+    border:
+      fgColor: darkslategray
+      focusColor: darkcyan
+    menu:
+      fgColor: *fg
+      keyColor: mediumspringgreen
+      # Hotkey numbers (Shift-1..0 from hotkeys.yaml) stand out from the
+      # built-in single-letter commands.
+      numKeyColor: orange
+    crumbs:
+      fgColor: black
+      bgColor: darkcyan
+      activeColor: mediumspringgreen
+    status:
+      newColor: cadetblue
+      modifyColor: yellow
+      addColor: mediumspringgreen
+      pendingColor: orange
+      errorColor: orangered
+      highlightColor: aqua
+      killColor: mediumpurple
+      completedColor: gray
+    title:
+      fgColor: *fg
+      bgColor: *bg
+      highlightColor: mediumspringgreen
+      counterColor: darkcyan
+      filterColor: orange
+
+  views:
+    charts:
+      bgColor: default
+      defaultDialColors:
+        - palegreen
+        - orangered
+      defaultChartColors:
+        - palegreen
+        - orangered
+
+    table:
+      fgColor: *fg
+      bgColor: *bg
+      # Inverted cursor row: the selected object is unmistakable when you are
+      # about to hit a destructive key.
+      cursorFgColor: black
+      cursorBgColor: darkcyan
+      markColor: mediumspringgreen
+      header:
+        fgColor: *fg
+        bgColor: *bg
+        sorterColor: mediumspringgreen
+
+    xray:
+      fgColor: *fg
+      bgColor: *bg
+      cursorColor: darkcyan
+      cursorTextColor: black
+      graphicColor: darkcyan
+
+    yaml:
+      keyColor: mediumspringgreen
+      colonColor: darkcyan
+      valueColor: *fg
+
+    logs:
+      fgColor: *fg
+      bgColor: *bg
+      indicator:
+        fgColor: *fg
+        bgColor: *bg
+        toggleOnColor: mediumspringgreen
+        toggleOffColor: gray

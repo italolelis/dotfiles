@@ -87,6 +87,28 @@ alias reload="exec ${SHELL} -l"
 # Print each PATH entry on a separate line
 alias path='echo -e ${PATH//:/\\n}'
 
+# ── Kubernetes / homelab k3s ─────────────────────────────────────────────────
+# The cluster is the k3s one on oracle/tank/cypher; ~/.kube/config holds its
+# admin credential. `k9s` reads ~/.config/k9s (see K9S_CONFIG_DIR in .exports).
+alias k="kubectl"
+alias kg="kubectl get"
+alias kgp="kubectl get pods"
+alias kga="kubectl get pods --all-namespaces"
+alias kd="kubectl describe"
+alias kl="kubectl logs"
+alias klf="kubectl logs -f"
+alias kaf="kubectl apply -f"
+alias kns="kubens"
+alias kctx="kubectx"
+# Watch the whole cluster at once, which is how k9s is actually used here.
+alias kk="k9s --all-namespaces"
+
+# Flux: the three commands that answer "why has my commit not landed".
+alias fx="flux"
+alias fxg="flux get all --all-namespaces"
+alias fxs="flux get sources all --all-namespaces"
+alias fxr="flux reconcile source git flux-system"
+
 # ── macOS-only aliases ────────────────────────────────────────────────────────
 if [[ $(uname -s) == Darwin ]]; then
   # Finder

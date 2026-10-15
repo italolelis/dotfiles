@@ -5,7 +5,7 @@ set -euo pipefail
 # Use a fixed constant — do NOT derive from BASH_SOURCE (see RESEARCH.md Pitfall 7)
 DOTFILES="$HOME/.dotfiles"
 BACKUP_DIR="$HOME/.backup/dotfiles_$(date +%Y%m%d_%H%M%S)"
-PACKAGES=(zsh git tmux starship cship cmux pi ssh misc bin)
+PACKAGES=(zsh git tmux starship cship cmux k9s pi ssh misc bin)
 # Single source of truth for pi's extension list, theme, and default model.
 # Read straight from the repo so it works before the pi package is stowed.
 PI_SETTINGS="$DOTFILES/pi/.pi/agent/settings.json"

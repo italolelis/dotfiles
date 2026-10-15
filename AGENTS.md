@@ -15,7 +15,7 @@ So: to add `~/.config/foo/bar.toml`, create `foo/.config/foo/bar.toml` and add `
 to the `PACKAGES` arrays. Never create a file directly in `$HOME` and never write to a
 path that is already a symlink into this repo — edit the file here instead.
 
-Stowed packages: `zsh git tmux starship cship cmux pi ssh misc bin`
+Stowed packages: `zsh git tmux starship cship cmux k9s pi ssh misc bin`
 
 Not stowed: `Brewfile`, `install.sh`, `macos.sh`.
 
@@ -46,6 +46,7 @@ tmux/       .tmux.conf
 starship/   .starship.toml
 cship/      cship config (Claude Code statusline)
 cmux/       .config/cmux/cmux.json — cmux is the only terminal managed here
+k9s/        .config/k9s/ — config, skin, aliases, hotkeys, views, flux/stern plugins
 ssh/        ~/.ssh/config only — never keys
 misc/       .curlrc, .editorconfig, .inputrc, .wgetrc
 bin/        ~/.local/bin scripts (currently `dot`)
@@ -65,6 +66,21 @@ silently diverged before.
 once held only a stow-ignored reference file, so the package was inert while the real
 config sat untracked in `~/.config/cmux/`. If a package seems to do nothing, run
 `find <pkg> -type f` and confirm the paths actually mirror `$HOME`.
+
+**k9s on macOS ignores `~/.config/k9s` by default.** It reads
+`~/Library/Application Support/k9s` unless `K9S_CONFIG_DIR` is set, which `zsh/.exports`
+does. Remove that export and the entire `k9s` package goes inert with no error — the
+same class of bug as the inert `cmux/` package below. Verify with `k9s info`, which
+prints the paths it will actually use.
+
+**k9s config schemas are not uniform.** `config.yaml` is nested under a `k9s:` root key;
+`views.yaml`, `aliases.yaml`, `hotkeys.yaml` and `plugins.yaml` are not. A wrong root is
+not a crash — it is one `WRN Validation failed` line in `~/.local/state/k9s/k9s.log` and
+a silently ignored file. Check that log after editing any of them.
+
+**The k9s node plugins depend on SSH host aliases.** `Ctrl-O` and `Ctrl-L` run
+`ssh $NAME` with the Kubernetes node name, which works only because `ssh/.ssh/config`
+defines `oracle`, `tank` and `cypher` with exactly those names.
 
 **cmux is the only terminal managed here.** Ghostty was replaced by cmux; don't
 reintroduce Ghostty config, casks, or packages. (cmux is Ghostty-backed internally,
