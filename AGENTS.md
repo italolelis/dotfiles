@@ -101,6 +101,13 @@ Brewfile, and cleanup would remove them.
 **`zsh/.extra` is tracked in git.** Secrets go in `~/.localrc` (gitignored, sourced by
 `.zshrc` if present). Never put a token, key, or password in any tracked file here.
 
+**SSH keys live in Proton Pass, not on disk.** pass-cli serves the "SSH Keys" vault on
+`~/.ssh/proton-pass-agent.sock`: `ssh/.ssh/config` points every host at it
+(`IdentityAgent`), `zsh/.exports` exports `SSH_AUTH_SOCK` for `ssh-add` and git's SSH
+signing, and `install.sh` starts the agent at login (a LaunchAgent on macOS, a systemd
+user unit on Linux). It serves nothing until `pass-cli login` has run once. Keep the
+`~/.ssh/*.pub` files: `IdentitiesOnly yes` offers only agent keys a `.pub` names.
+
 **Never add private keys to `ssh/`.** `ssh/.stow-local-ignore` blocks the common
 filenames, but that is a safety net, not permission. Only `ssh/config` belongs here.
 

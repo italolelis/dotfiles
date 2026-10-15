@@ -49,6 +49,7 @@ After it finishes, restart your shell (or `source ~/.zshrc`).
   `~/.pi/agent/auth.json` and `~/.pi/agent/mcp.json` hold live credentials and are **never** tracked.
 
 - **Local-only secrets** — put env vars, tokens, work-specific config into `~/.localrc` (sourced by `~/.zshrc` if present). **Never** put secrets in `zsh/.extra` — that file is tracked in this repo.
+- **SSH keys** live in Proton Pass (vault "SSH Keys"), served by `pass-cli`'s SSH agent, which `install.sh` starts at login. Run `pass-cli login` once on a new machine; until then ssh falls back to any key files in `~/.ssh`.
 
 ## Layout
 
