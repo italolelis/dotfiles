@@ -14,7 +14,12 @@ export PAGER="less"
 export STARSHIP_CONFIG="$HOME/.starship.toml"
 
 # Node.js and npm
-export NODE_ENV=development
+# NODE_ENV is deliberately NOT set globally. Build tools set it themselves
+# (`next build` → production, `next dev` → development). A stray global value
+# makes bundlers resolve dev-only package exports during a production build:
+# Next 16 rejects it outright, and React fails with a confusing
+# "Cannot read properties of null (reading 'useContext')". Set it per-command
+# if a script genuinely needs it. Removed 2026-07-25.
 export npm_config_prefix="$HOME/.npm-global"
 
 # Docker optimizations for macOS
