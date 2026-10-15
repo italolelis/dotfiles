@@ -1,0 +1,57 @@
+# k9s custom column layouts.
+#
+# Only core resources are overridden here. CRD tables (Flux, cert-manager,
+# Traefik) are rendered from the CRD's own printer columns, and naming a
+# column that does not exist gives you a blank one — not an error — so those
+# are deliberately left alone.
+#
+# Column suffixes: |W wide-only, |H hidden, |R right-align, |T time.
+#
+# NOTE: unlike config.yaml, this file has NO `k9s:` root key — `views:` is
+# top-level. Getting that wrong is one warning line in the k9s log and the
+# whole file is ignored.
+views:
+  # NODE is promoted out of wide-only. This cluster is three machines of two
+  # architectures with most workloads pinned to oracle, so "which node did
+  # this land on" is the first question for almost every pod problem — an
+  # ImagePullBackOff on an arm64 Pi, or a local-path PVC the pod cannot follow.
+  v1/pods:
+    sortColumn: AGE:desc
+    columns:
+      - NAMESPACE
+      - NAME
+      - READY
+      - STATUS
+      - RESTARTS
+      - NODE
+      - CPU
+      - MEM
+      - AGE
+
+  # Ready / up-to-date / available side by side: a Deployment parked at 0/1
+  # with no events is usually a failing healthcheck, not a scheduling problem.
+  apps/v1/deployments:
+    sortColumn: AGE:desc
+    columns:
+      - NAMESPACE
+      - NAME
+      - READY
+      - UP-TO-DATE
+      - AVAILABLE
+      - AGE
+
+  # ROLE distinguishes oracle (control-plane, amd64, the NVMe that backs
+  # local-path) from the two arm64 agents. TAINTS because a surprise taint is
+  # a silent reason for Pending pods.
+  v1/nodes:
+    columns:
+      - NAME
+      - STATUS
+      - ROLE
+      - TAINTS
+      - VERSION
+      - CPU
+      - "%CPU"
+      - MEM
+      - "%MEM"
+      - AGE

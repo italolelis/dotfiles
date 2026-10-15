@@ -28,5 +28,18 @@ export HOMEBREW_NO_INSECURE_REDIRECT=1
 # Google Cloud SDK auth plugin
 export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 
+# Kubernetes
+# k9s on macOS defaults to ~/Library/Application Support/k9s, so without this
+# the `k9s` stow package at ~/.config/k9s is inert — config, skin, hotkeys and
+# plugins all silently ignored, with no error. Do not remove.
+export K9S_CONFIG_DIR="$HOME/.config/k9s"
+# Logs and screen dumps stay out of the repo: they are state, not config, and
+# ~/.config/k9s is a symlink into ~/.dotfiles.
+export K9S_LOGS_DIR="$HOME/.local/state/k9s"
+# Merge-friendly kubeconfig: ~/.kube/config is the homelab k3s admin
+# credential (see homelab repo, `make kubeconfig`). Extra clusters can be
+# appended here colon-separated rather than overwriting it.
+export KUBECONFIG="$HOME/.kube/config"
+
 # macOS fork safety (TODO: verify if still needed on current macOS)
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES

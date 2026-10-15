@@ -26,6 +26,16 @@ brew "git-delta"
 brew "go"
 brew "kubectl"
 brew "kubectx"
+
+# Kubernetes — homelab k3s cluster (oracle/tank/cypher), GitOps via Flux.
+# k9s config is the `k9s` stow package; flux/stern back its plugins, so
+# removing either leaves dead keybindings.
+tap "fluxcd/tap"
+brew "k9s"
+brew "helm"
+brew "fluxcd/tap/flux"
+brew "stern"
+
 brew "node"
 brew "python@3.11"
 brew "shellcheck"

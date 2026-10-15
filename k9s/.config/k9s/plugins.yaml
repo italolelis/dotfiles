@@ -1,0 +1,313 @@
+# k9s plugins — shell out to flux / stern / ssh with the selected row as args.
+#
+# Variables k9s substitutes: $NAME, $NAMESPACE, $CONTEXT, $RESOURCE_NAME,
+# $COL-<column>. `background: false` keeps k9s suspended until the command
+# exits, which is what you want for anything that prints.
+#
+# Shortcut choice: Ctrl-<letter>, avoiding keys k9s binds itself
+# (Ctrl-A aliases, Ctrl-D delete, Ctrl-K kill, Ctrl-S screendump,
+# Ctrl-W wide, Ctrl-U clear prompt, Ctrl-N/P navigation, Ctrl-Z suspend).
+# Scopes are per-resource, so the same shortcut is reused across kinds.
+#
+# Anything that mutates the cluster sets `confirm: true`.
+plugins:
+  # ── Flux: reconcile ────────────────────────────────────────────────────────
+  # --with-source pulls the Git revision first; without it you re-apply the
+  # revision Flux already has, which is almost never what you meant when you
+  # just pushed a commit.
+  flux-reconcile-kustomization:
+    shortCut: Ctrl-R
+    description: Reconcile (with source)
+    scopes:
+      - kustomizations
+    command: flux
+    background: false
+    confirm: false
+    args:
+      - reconcile
+      - kustomization
+      - $NAME
+      - --namespace
+      - $NAMESPACE
+      - --context
+      - $CONTEXT
+      - --with-source
+
+  flux-reconcile-helmrelease:
+    shortCut: Ctrl-R
+    description: Reconcile (with source)
+    scopes:
+      - helmreleases
+    command: flux
+    background: false
+    confirm: false
+    args:
+      - reconcile
+      - helmrelease
+      - $NAME
+      - --namespace
+      - $NAMESPACE
+      - --context
+      - $CONTEXT
+      - --with-source
+
+  flux-reconcile-source-git:
+    shortCut: Ctrl-R
+    description: Reconcile source
+    scopes:
+      - gitrepositories
+    command: flux
+    background: false
+    confirm: false
+    args:
+      - reconcile
+      - source
+      - git
+      - $NAME
+      - --namespace
+      - $NAMESPACE
+      - --context
+      - $CONTEXT
+
+  flux-reconcile-source-helm:
+    shortCut: Ctrl-R
+    description: Reconcile source
+    scopes:
+      - helmrepositories
+    command: flux
+    background: false
+    confirm: false
+    args:
+      - reconcile
+      - source
+      - helm
+      - $NAME
+      - --namespace
+      - $NAMESPACE
+      - --context
+      - $CONTEXT
+
+  flux-reconcile-source-oci:
+    shortCut: Ctrl-R
+    description: Reconcile source
+    scopes:
+      - ocirepositories
+    command: flux
+    background: false
+    confirm: false
+    args:
+      - reconcile
+      - source
+      - oci
+      - $NAME
+      - --namespace
+      - $NAMESPACE
+      - --context
+      - $CONTEXT
+
+  # ── Flux: suspend / resume ─────────────────────────────────────────────────
+  # Suspend before hand-editing a Flux-managed object, or Flux reverts you
+  # within the reconcile interval. Both confirm: suspending something and
+  # forgetting is how a cluster silently stops tracking Git.
+  flux-suspend-kustomization:
+    shortCut: Ctrl-T
+    description: Suspend
+    scopes:
+      - kustomizations
+    command: flux
+    background: false
+    confirm: true
+    args:
+      - suspend
+      - kustomization
+      - $NAME
+      - --namespace
+      - $NAMESPACE
+      - --context
+      - $CONTEXT
+
+  flux-resume-kustomization:
+    shortCut: Ctrl-Y
+    description: Resume
+    scopes:
+      - kustomizations
+    command: flux
+    background: false
+    confirm: true
+    args:
+      - resume
+      - kustomization
+      - $NAME
+      - --namespace
+      - $NAMESPACE
+      - --context
+      - $CONTEXT
+
+  flux-suspend-helmrelease:
+    shortCut: Ctrl-T
+    description: Suspend
+    scopes:
+      - helmreleases
+    command: flux
+    background: false
+    confirm: true
+    args:
+      - suspend
+      - helmrelease
+      - $NAME
+      - --namespace
+      - $NAMESPACE
+      - --context
+      - $CONTEXT
+
+  flux-resume-helmrelease:
+    shortCut: Ctrl-Y
+    description: Resume
+    scopes:
+      - helmreleases
+    command: flux
+    background: false
+    confirm: true
+    args:
+      - resume
+      - helmrelease
+      - $NAME
+      - --namespace
+      - $NAMESPACE
+      - --context
+      - $CONTEXT
+
+  # ── Flux: why is this not ready ────────────────────────────────────────────
+  # `flux events` for one object beats scrolling the namespace event stream,
+  # which on this cluster is mostly image pulls.
+  flux-events:
+    shortCut: Ctrl-E
+    description: Flux events
+    scopes:
+      - kustomizations
+      - helmreleases
+      - gitrepositories
+      - helmrepositories
+      - ocirepositories
+    command: sh
+    background: false
+    confirm: false
+    args:
+      - -c
+      - "flux events --for $(echo $RESOURCE_NAME | sed 's/ies$/y/; s/s$//')/$NAME --namespace $NAMESPACE --context $CONTEXT | less -R"
+
+  # ── stern: logs across every pod of a workload ─────────────────────────────
+  # k9s's own `l` follows one container. stern follows every pod of the
+  # selector at once, including ones that restart mid-tail — the difference
+  # that matters when a Deployment is crash-looping on one node only.
+  stern-logs:
+    shortCut: Ctrl-G
+    description: Stern (all pods)
+    scopes:
+      - deployments
+      - statefulsets
+      - daemonsets
+      - jobs
+    command: stern
+    background: false
+    confirm: false
+    args:
+      - --tail
+      - "100"
+      - --timestamps
+      - --namespace
+      - $NAMESPACE
+      - --context
+      - $CONTEXT
+      - $NAME
+
+  stern-logs-pod:
+    shortCut: Ctrl-G
+    description: Stern (all containers)
+    scopes:
+      - pods
+    command: stern
+    background: false
+    confirm: false
+    args:
+      - --tail
+      - "100"
+      - --timestamps
+      - --container
+      - ".*"
+      - --namespace
+      - $NAMESPACE
+      - --context
+      - $CONTEXT
+      - $NAME
+
+  # ── Rollout restart ────────────────────────────────────────────────────────
+  # The honest way to bounce a workload. Deleting pods by hand races the
+  # controller; this one respects the update strategy.
+  rollout-restart:
+    shortCut: Ctrl-J
+    description: Rollout restart
+    scopes:
+      - deployments
+      - statefulsets
+      - daemonsets
+    command: kubectl
+    background: false
+    confirm: true
+    args:
+      - rollout
+      - restart
+      - $RESOURCE_NAME/$NAME
+      - --namespace
+      - $NAMESPACE
+      - --context
+      - $CONTEXT
+
+  rollout-status:
+    shortCut: Ctrl-B
+    description: Rollout status
+    scopes:
+      - deployments
+      - statefulsets
+      - daemonsets
+    command: kubectl
+    background: false
+    confirm: false
+    args:
+      - rollout
+      - status
+      - $RESOURCE_NAME/$NAME
+      - --namespace
+      - $NAMESPACE
+      - --context
+      - $CONTEXT
+      - --timeout
+      - 120s
+
+  # ── Nodes: ssh to the box ──────────────────────────────────────────────────
+  # Works because the k8s node names (oracle, tank, cypher) are also the Host
+  # aliases in ~/.ssh/config. For the things kubectl cannot see: k3s service
+  # logs, ufw, dmesg, disk.
+  ssh-node:
+    shortCut: Ctrl-O
+    description: SSH to node
+    scopes:
+      - nodes
+    command: ssh
+    background: false
+    confirm: false
+    args:
+      - -t
+      - $NAME
+
+  k3s-journal:
+    shortCut: Ctrl-L
+    description: k3s service log
+    scopes:
+      - nodes
+    command: sh
+    background: false
+    confirm: false
+    args:
+      - -c
+      - "ssh -t $NAME 'sudo journalctl -u k3s -u k3s-agent --no-pager -n 200 | less -R'"

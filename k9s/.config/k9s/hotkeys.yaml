@@ -1,0 +1,70 @@
+# k9s hotkeys — one keystroke to a view, from anywhere.
+#
+# Plain number keys 0-9 are reserved by k9s for switching to a favourite
+# namespace, so hotkeys use Shift-<number>. These are the views this homelab
+# actually gets opened for, in rough order of how often.
+#
+# `command` is exactly what you would type at the `:` prompt, so the aliases
+# from aliases.yaml are valid here too.
+hotKeys:
+  shift-1:
+    shortCut: Shift-1
+    description: Pods (all namespaces)
+    command: pods
+    keepHistory: true
+
+  shift-2:
+    shortCut: Shift-2
+    description: Flux kustomizations
+    command: ks
+    keepHistory: true
+
+  shift-3:
+    shortCut: Shift-3
+    description: Flux helmreleases
+    command: hr
+    keepHistory: true
+
+  shift-4:
+    shortCut: Shift-4
+    description: Flux sources (git)
+    command: gitrepo
+    keepHistory: true
+
+  shift-5:
+    shortCut: Shift-5
+    description: Nodes
+    command: nodes
+    keepHistory: true
+
+  shift-6:
+    shortCut: Shift-6
+    description: Events
+    command: events
+    keepHistory: true
+
+  # Storage and certs: the two things that break quietly. A Pending PVC means
+  # a pod was scheduled off oracle; a not-Ready Certificate means DNS-01.
+  shift-7:
+    shortCut: Shift-7
+    description: PersistentVolumeClaims
+    command: pvc
+    keepHistory: true
+
+  shift-8:
+    shortCut: Shift-8
+    description: Certificates
+    command: cert
+    keepHistory: true
+
+  shift-9:
+    shortCut: Shift-9
+    description: Traefik IngressRoutes
+    command: ir
+    keepHistory: true
+
+  shift-0:
+    shortCut: Shift-0
+    description: Services
+    command: services
+    keepHistory: true

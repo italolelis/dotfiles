@@ -1,0 +1,56 @@
+# k9s resource aliases — typed at the `:` prompt.
+#
+# Ctrl-A in k9s lists every alias, built-in ones included. Entries here are
+# either things k9s has no short name for, or CRDs of this homelab's stack
+# (Flux, cert-manager, Traefik) that are tedious to type in full.
+#
+# Format: <alias>: <group>/<version>/<plural resource>
+aliases:
+  # ── Flux: reconciliation ───────────────────────────────────────────────────
+  # `ks` and `hr` also work as CRD short names, but pinning them here keeps
+  # them unambiguous if another CRD ever claims the same abbreviation.
+  ks: kustomize.toolkit.fluxcd.io/v1/kustomizations
+  flux: kustomize.toolkit.fluxcd.io/v1/kustomizations
+  hr: helm.toolkit.fluxcd.io/v2/helmreleases
+
+  # ── Flux: sources ──────────────────────────────────────────────────────────
+  gitrepo: source.toolkit.fluxcd.io/v1/gitrepositories
+  helmrepo: source.toolkit.fluxcd.io/v1/helmrepositories
+  ocirepo: source.toolkit.fluxcd.io/v1/ocirepositories
+  hchart: source.toolkit.fluxcd.io/v1/helmcharts
+
+  # ── cert-manager ───────────────────────────────────────────────────────────
+  # The wildcard *.vietrolabs.com cert lives here. `chal` and `ord` are where
+  # a stuck DNS-01 actually shows its error.
+  cert: cert-manager.io/v1/certificates
+  certreq: cert-manager.io/v1/certificaterequests
+  issuer: cert-manager.io/v1/clusterissuers
+  chal: acme.cert-manager.io/v1/challenges
+  ord: acme.cert-manager.io/v1/orders
+
+  # ── Traefik ────────────────────────────────────────────────────────────────
+  ir: traefik.io/v1alpha1/ingressroutes
+  irtcp: traefik.io/v1alpha1/ingressroutetcps
+  mw: traefik.io/v1alpha1/middlewares
+  tlsopt: traefik.io/v1alpha1/tlsoptions
+
+  # ── Core workloads ─────────────────────────────────────────────────────────
+  dep: apps/v1/deployments
+  sts: apps/v1/statefulsets
+  ds: apps/v1/daemonsets
+  rs: apps/v1/replicasets
+  cj: batch/v1/cronjobs
+  jo: batch/v1/jobs
+
+  # ── Config, storage, network ───────────────────────────────────────────────
+  # Storage matters here: Postgres lives on local-path on oracle's NVMe, so
+  # a Pending PVC usually means a pod landed on the wrong node.
+  cm: v1/configmaps
+  sec: v1/secrets
+  pvc: v1/persistentvolumeclaims
+  pv: v1/persistentvolumes
+  sc: storage.k8s.io/v1/storageclasses
+  ep: v1/endpoints
+  ing: networking.k8s.io/v1/ingresses
+  np: networking.k8s.io/v1/networkpolicies
+  ev: v1/events

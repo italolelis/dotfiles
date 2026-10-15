@@ -1,0 +1,75 @@
+# k9s global configuration.
+#
+# Stowed to ~/.config/k9s/config.yaml. Only *global* settings belong here —
+# per-context state (last view, favorite namespaces, port-forwards) is written
+# by k9s to ~/.local/share/k9s/clusters/<cluster>/<context>/config.yaml and is
+# deliberately NOT tracked: it is machine state, not configuration.
+k9s:
+  # Poll interval in seconds. The homelab API server is a single k3s node on a
+  # LAN; 2s is cheap here and makes rollouts feel live.
+  refreshRate: 2
+  maxConnRetry: 5
+
+  # Guard rail: `readOnly: true` would disable delete/edit/scale entirely.
+  # Left false on purpose — this is the admin workstation — but the delete and
+  # kill keys still prompt, and every destructive plugin sets `confirm: true`.
+  readOnly: false
+
+  # Ctrl-C quits immediately. Set true if you keep killing the session by
+  # reflex while copying text.
+  noExitOnCtrlC: false
+
+  # Skip the "new k9s available" call on startup; brew owns the version.
+  skipLatestRevCheck: true
+
+  # Pod counts per namespace cost an extra list call on every refresh. Cheap
+  # at this cluster's size and genuinely useful, so keep them.
+  disablePodCounting: false
+
+  ui:
+    # `default` background in the skin means the terminal's own background
+    # shows through, so k9s follows the cmux theme instead of fighting it.
+    skin: homelab
+    enableMouse: false
+    headless: false
+    logoless: false
+    crumbsless: false
+    noIcons: false
+    # Reactive mode watches the kubeconfig and external changes and redraws
+    # without a manual refresh — the point of leaving k9s open on a second
+    # pane during a Flux reconcile.
+    reactive: true
+    defaultsToFullScreen: false
+
+  # `s` on a node opens a privileged pod on that node. The Pis are arm64 and
+  # oracle is amd64, so the image must be multi-arch. busybox is.
+  shellPod:
+    image: busybox:1.36.1
+    namespace: default
+    limits:
+      cpu: 100m
+      memory: 100Mi
+
+  # Trivy image scanning shells out per image; off by default, the Pis do not
+  # need the extra load.
+  imageScans:
+    enable: false
+
+  logger:
+    tail: 200
+    buffer: 5000
+    # -1 = all available logs rather than a time window.
+    sinceSeconds: -1
+    textWrap: true
+    showTime: false
+
+  # Colouring for the CPU/MEM columns. Deliberately tighter than the k9s
+  # defaults (80/90): the Pis have 8 GB and no swap, so 70% memory is already
+  # the point at which you want to know.
+  thresholds:
+    cpu:
+      critical: 90
+      warn: 70
+    memory:
+      critical: 90
+      warn: 70
