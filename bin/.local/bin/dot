@@ -5,7 +5,8 @@ set -euo pipefail
 
 DOTFILES="$HOME/.dotfiles"
 # Keep in sync with PACKAGES in ~/.dotfiles/install.sh
-PACKAGES=(zsh git tmux starship cship cmux k9s pi ssh misc bin)
+PACKAGES=(zsh git tmux starship cship cmux k9s pi mise ssh misc bin)
+LINUX_PACKAGES=(ghostty)  # Keep in sync with LINUX_PACKAGES in install.sh
 
 PLATFORM="$(/usr/bin/uname -s)"
 IS_MACOS=false
@@ -26,7 +27,9 @@ ok "git pull"
 
 # 2. Restow all packages (prunes stale symlinks, creates new ones)
 info "Restowing packages..."
-for pkg in "${PACKAGES[@]}"; do
+pkgs=("${PACKAGES[@]}")
+if $IS_LINUX; then pkgs+=("${LINUX_PACKAGES[@]}"); fi
+for pkg in "${pkgs[@]}"; do
   if [[ -d "$DOTFILES/$pkg" ]]; then
     stow --restow --no-folding --target="$HOME" --dir="$DOTFILES" "$pkg"
     ok "$pkg"
@@ -45,6 +48,19 @@ if $IS_MACOS; then
   info "Updating Homebrew..."
   brew update && brew upgrade && brew cleanup
   ok "brew"
+fi
+
+# 5. Install anything new in the Archfile (Arch only). System upgrades stay
+#    with `omarchy-update`.
+if $IS_LINUX && command -v pacman &>/dev/null; then
+  "$DOTFILES/bin/.local/bin/arch-bundle" install
+fi
+
+# 6. Install anything new in the mise config
+if command -v mise &>/dev/null; then
+  info "Installing mise tools..."
+  mise install
+  ok "mise"
 fi
 
 echo ""

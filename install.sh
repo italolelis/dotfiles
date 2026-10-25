@@ -5,7 +5,10 @@ set -euo pipefail
 # Use a fixed constant — do NOT derive from BASH_SOURCE (see RESEARCH.md Pitfall 7)
 DOTFILES="$HOME/.dotfiles"
 BACKUP_DIR="$HOME/.backup/dotfiles_$(date +%Y%m%d_%H%M%S)"
-PACKAGES=(zsh git tmux starship cship cmux k9s pi ssh misc bin)
+PACKAGES=(zsh git tmux starship cship cmux k9s pi mise ssh misc bin)
+# Linux only: Ghostty is the Omarchy terminal. On macOS cmux is Ghostty-backed, and
+# this config imports an Omarchy theme path that does not exist there.
+LINUX_PACKAGES=(ghostty)
 # Single source of truth for pi's extension list, theme, and default model.
 # Read straight from the repo so it works before the pi package is stowed.
 PI_SETTINGS="$DOTFILES/pi/.pi/agent/settings.json"
@@ -69,6 +72,27 @@ run_brew_bundle() {
   else
     log "Brewfile not found at $DOTFILES/Brewfile — skipping (will be added in plan 01-03)"
   fi
+}
+
+# ── Arch / Omarchy ─────────────────────────────────────────────────────────────
+# The Archfile is the Brewfile for Arch; arch-bundle installs whatever it lists
+# that is missing. Run from the repo path: bin/ is not stowed yet.
+arch_install_packages() {
+  info "Running arch-bundle..."
+  "$DOTFILES/bin/.local/bin/arch-bundle" install \
+    || log "[warn] some Archfile entries failed — review output above"
+}
+
+# Global mise tools (node, gh, claude, codex, pi) from the stowed
+# ~/.config/mise/config.toml. Omarchy ships mise; macOS gets these from brew.
+install_mise_tools() {
+  command -v mise &>/dev/null || return 0
+  info "Installing mise tools..."
+  mise install || log "[warn] some mise tools failed — review output above"
+  # This script never sources zsh's mise activation; the shims make node, npm
+  # and pi visible to install_pi below.
+  export PATH="$HOME/.local/share/mise/shims:$PATH"
+  ok "mise tools"
 }
 
 # ── Linux Setup ───────────────────────────────────────────────────────────────
@@ -290,9 +314,44 @@ stow_package() {
 }
 
 stow_packages() {
-  for pkg in "${PACKAGES[@]}"; do
+  local pkgs=("${PACKAGES[@]}")
+  if $IS_LINUX; then pkgs+=("${LINUX_PACKAGES[@]}"); fi
+  for pkg in "${pkgs[@]}"; do
     stow_package "$pkg"
   done
+}
+
+# ── Git credential helper ──────────────────────────────────────────────────────
+# The helper is platform-specific, so it lives in the untracked
+# ~/.gitconfig.local (included by git/.gitconfig) rather than the tracked file.
+configure_git_credentials() {
+  info "Checking git credential helper..."
+  local local_config="$HOME/.gitconfig.local"
+  if git config --file "$local_config" credential.helper &>/dev/null; then
+    ok "credential.helper already set in $local_config"
+    return 0
+  fi
+  local helper=""
+  if $IS_MACOS; then
+    helper="osxkeychain"
+  elif [[ -x /usr/lib/git-core/git-credential-libsecret ]]; then
+    helper="/usr/lib/git-core/git-credential-libsecret"
+  fi
+  if [[ -n "$helper" ]]; then
+    git config --file "$local_config" credential.helper "$helper"
+    ok "credential.helper = $helper"
+  else
+    log "No credential helper available — skipping"
+  fi
+}
+
+# ── Login shell ────────────────────────────────────────────────────────────────
+check_login_shell() {
+  local zsh_path
+  zsh_path="$(command -v zsh || true)"
+  if [[ -n "$zsh_path" ]] && [[ "$(getent passwd "$USER" 2>/dev/null | cut -d: -f7)" != "$zsh_path" ]]; then
+    log "[warn] login shell is not zsh — run: chsh -s $zsh_path"
+  fi
 }
 
 # ── Proton Pass SSH agent ──────────────────────────────────────────────────────
@@ -351,6 +410,9 @@ EOF
       ok "SSH agent starts at login ($label)"
     fi
   elif $IS_LINUX && command -v systemctl &>/dev/null; then
+    # pass-cli 2.4.2 fails the first `pass-cli login` ("Error opening temp
+    # session file") when its data dir does not exist yet.
+    mkdir -p "$HOME/.local/share/proton-pass-cli" && chmod 700 "$HOME/.local/share/proton-pass-cli"
     local unit="proton-pass-ssh-agent.service"
     if systemctl --user is-enabled "$unit" &>/dev/null; then
       ok "SSH agent already enabled ($unit)"
@@ -397,6 +459,10 @@ main() {
     run_brew_bundle
     install_cship
   elif $IS_LINUX; then
+    # On Arch this installs zsh and stow, so the apt-based checks below no-op.
+    if command -v pacman &>/dev/null; then
+      arch_install_packages
+    fi
     linux_require_zsh
     linux_require_stow
     linux_install_antidote
@@ -405,8 +471,13 @@ main() {
     install_cship
   fi
 
+  # ~/.ssh must stay private; create it before stow would make it 755.
+  mkdir -p "$HOME/.ssh" && chmod 700 "$HOME/.ssh"
   stow_packages
+  configure_git_credentials
   install_proton_ssh_agent
+  check_login_shell
+  install_mise_tools
 
   # After stowing: ~/.pi/agent/settings.json is a symlink into this repo by
   # now, so `pi install` records new packages in the tracked file rather than

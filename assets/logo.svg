@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 300" width="900" height="300" role="img" aria-labelledby="title desc">
+  <title id="title">dotfiles</title>
+  <desc id="desc">A happy moving box with colorful dots bouncing out of it, next to the word dotfiles.</desc>
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFF8EE"/>
+      <stop offset="1" stop-color="#FDEBD8"/>
+    </linearGradient>
+    <linearGradient id="front" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#EDB574"/>
+      <stop offset="1" stop-color="#DC9A55"/>
+    </linearGradient>
+    <g id="sparkle">
+      <path d="M0 -9 L2.2 -2.2 L9 0 L2.2 2.2 L0 9 L-2.2 2.2 L-9 0 L-2.2 -2.2 Z"/>
+    </g>
+  </defs>
+
+  <!-- Card -->
+  <rect x="2" y="2" width="896" height="296" rx="32" fill="url(#bg)" stroke="#F1D6B8" stroke-width="2"/>
+
+  <!-- Confetti in the background -->
+  <g opacity="0.35">
+    <circle cx="60" cy="40" r="4" fill="#4D96FF"/>
+    <circle cx="850" cy="260" r="5" fill="#FF6B6B"/>
+    <circle cx="830" cy="44" r="4" fill="#6BCB77"/>
+    <circle cx="380" cy="270" r="3" fill="#C77DFF"/>
+    <circle cx="40" cy="250" r="3" fill="#FFB020"/>
+  </g>
+
+  <!-- Shadow -->
+  <ellipse cx="200" cy="268" rx="125" ry="12" fill="#E3C3A0" opacity="0.7"/>
+
+  <!-- Back flap -->
+  <polygon points="130,118 300,118 312,82 142,82" fill="#F2C48C" stroke="#9A6233" stroke-width="3" stroke-linejoin="round"/>
+
+  <!-- Dots popping out of the box -->
+  <path d="M190 112 C 230 40, 320 20, 395 58" fill="none" stroke="#C9A27E" stroke-width="2.5" stroke-dasharray="2 9" stroke-linecap="round"/>
+  <circle cx="178" cy="100" r="11" fill="#FF6B6B" stroke="#2B1B10" stroke-width="2.5"/>
+  <circle cx="214" cy="66" r="13" fill="#FFD93D" stroke="#2B1B10" stroke-width="2.5"/>
+  <circle cx="258" cy="42" r="10" fill="#6BCB77" stroke="#2B1B10" stroke-width="2.5"/>
+  <circle cx="304" cy="30" r="14" fill="#4D96FF" stroke="#2B1B10" stroke-width="2.5"/>
+  <circle cx="350" cy="36" r="9" fill="#C77DFF" stroke="#2B1B10" stroke-width="2.5"/>
+  <!-- little shines on the dots -->
+  <g fill="#FFFFFF" opacity="0.85">
+    <circle cx="174" cy="96" r="3"/>
+    <circle cx="209" cy="61" r="3.5"/>
+    <circle cx="254" cy="38" r="2.5"/>
+    <circle cx="299" cy="25" r="4"/>
+    <circle cx="347" cy="33" r="2.5"/>
+  </g>
+
+  <!-- Sparkles -->
+  <use href="#sparkle" x="140" y="62" fill="#FFB020"/>
+  <use href="#sparkle" x="382" y="88" fill="#FF6B6B"/>
+  <use href="#sparkle" x="246" y="88" fill="#4D96FF"/>
+
+  <!-- Box: inside, side, front -->
+  <polygon points="90,140 130,118 300,118 260,140" fill="#7A4A22" stroke="#5C3416" stroke-width="3" stroke-linejoin="round"/>
+  <polygon points="260,140 300,118 300,238 260,262" fill="#C98546" stroke="#5C3416" stroke-width="3" stroke-linejoin="round"/>
+  <rect x="90" y="140" width="170" height="122" fill="url(#front)" stroke="#5C3416" stroke-width="3" stroke-linejoin="round"/>
+
+  <!-- Side flaps -->
+  <polygon points="90,140 130,118 92,84 50,108" fill="#F2C48C" stroke="#5C3416" stroke-width="3" stroke-linejoin="round"/>
+  <polygon points="260,140 300,118 352,104 314,128" fill="#E7AE6D" stroke="#5C3416" stroke-width="3" stroke-linejoin="round"/>
+
+  <!-- Face -->
+  <ellipse cx="142" cy="178" rx="8" ry="10" fill="#2B1B10"/>
+  <ellipse cx="208" cy="178" rx="8" ry="10" fill="#2B1B10"/>
+  <circle cx="145" cy="174" r="3" fill="#FFFFFF"/>
+  <circle cx="211" cy="174" r="3" fill="#FFFFFF"/>
+  <ellipse cx="122" cy="196" rx="10" ry="6" fill="#FF8FAB" opacity="0.7"/>
+  <ellipse cx="228" cy="196" rx="10" ry="6" fill="#FF8FAB" opacity="0.7"/>
+  <path d="M160 192 Q 175 210 190 192" fill="#9B2C2C" stroke="#2B1B10" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Shipping label -->
+  <rect x="113" y="220" width="124" height="28" rx="5" fill="#FFFDF8" stroke="#5C3416" stroke-width="2.5" transform="rotate(-3 175 234)"/>
+  <text x="175" y="240" text-anchor="middle" transform="rotate(-3 175 234)" font-family="'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, monospace" font-size="15" font-weight="700" fill="#5C3416">~/.dotfiles</text>
+
+  <!-- Wordmark -->
+  <text x="420" y="138" font-family="ui-rounded, 'SF Pro Rounded', Nunito, 'Varela Round', system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="78" font-weight="800" fill="#2B1B10" letter-spacing="-1">dotfiles</text>
+  <g>
+    <circle cx="428" cy="162" r="6" fill="#FF6B6B"/>
+    <circle cx="446" cy="162" r="6" fill="#FFD93D"/>
+    <circle cx="464" cy="162" r="6" fill="#6BCB77"/>
+    <circle cx="482" cy="162" r="6" fill="#4D96FF"/>
+    <circle cx="500" cy="162" r="6" fill="#C77DFF"/>
+  </g>
+  <text x="422" y="200" font-family="ui-rounded, 'SF Pro Rounded', Nunito, system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="22" font-weight="600" fill="#8A5F3A">pack once, unpack on any machine</text>
+
+  <!-- Platform pills -->
+  <g font-family="'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, monospace" font-size="14" font-weight="700" text-anchor="middle">
+    <rect x="422" y="222" width="190" height="34" rx="17" fill="#2B1B10"/>
+    <text x="517" y="244" fill="#FFF8EE">macOS · Brewfile</text>
+    <rect x="626" y="222" width="210" height="34" rx="17" fill="#1793D1"/>
+    <text x="731" y="244" fill="#FFFFFF">Omarchy · Archfile</text>
+  </g>
+</svg>

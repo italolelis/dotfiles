@@ -82,6 +82,12 @@ if command -v fzf &>/dev/null; then
   source <(fzf --zsh)
 fi
 
+# ── 9b. mise ──────────────────────────────────────────────────────────────────
+# Omarchy installs node, gh and other CLIs through mise
+if command -v mise &>/dev/null; then
+  eval "$(mise activate zsh)"
+fi
+
 # ── 10. Starship prompt ──────────────────────────────────────────────────────
 # Always last — prompt init must come after all plugins and completions
 if command -v starship &>/dev/null; then

@@ -1,7 +1,7 @@
 # AGENTS.md
 
-Personal dotfiles for macOS (with a Debian/Ubuntu fallback), managed with **GNU Stow**
-and a **Brewfile**. There is no build system, no test framework, and no CI — the
+Personal dotfiles for macOS and Omarchy (Arch), with a Debian/Ubuntu fallback, managed
+with **GNU Stow**, a **Brewfile** (macOS) and an **Archfile** (Arch). There is no build system, no test framework, and no CI — the
 "application" is the user's `$HOME`, and every change here eventually gets symlinked
 into it.
 
@@ -15,9 +15,10 @@ So: to add `~/.config/foo/bar.toml`, create `foo/.config/foo/bar.toml` and add `
 to the `PACKAGES` arrays. Never create a file directly in `$HOME` and never write to a
 path that is already a symlink into this repo — edit the file here instead.
 
-Stowed packages: `zsh git tmux starship cship cmux k9s pi ssh misc bin`
+Stowed packages: `zsh git tmux starship cship cmux k9s pi mise ssh misc bin`, plus
+`ghostty` on Linux only (`LINUX_PACKAGES`).
 
-Not stowed: `Brewfile`, `install.sh`, `macos.sh`.
+Not stowed: `Brewfile`, `Archfile`, `install.sh`, `macos.sh`, `assets/` (README logo).
 
 ## Setup and check commands
 
@@ -25,9 +26,11 @@ Not stowed: `Brewfile`, `install.sh`, `macos.sh`.
 ./install.sh --force              # full idempotent install; --force skips the prompt
 ~/.local/bin/dot                  # update: git pull + restow + antidote + brew
 bash -n install.sh                # syntax check
-shellcheck install.sh macos.sh    # lint (shellcheck is in the Brewfile)
+shellcheck install.sh macos.sh bin/.local/bin/*   # lint (in the Brewfile and Archfile)
 stow -nv --target="$HOME" --dir=. <pkg>   # DRY RUN — show what stow would do
 brew bundle check --file=Brewfile --verbose   # what's missing vs. the Brewfile
+arch-bundle check                 # what's missing vs. the Archfile (Arch)
+arch-bundle dump                  # installed here, but in neither the Archfile nor Omarchy's defaults
 ```
 
 There are no tests. **Verification is running the thing**: `bash -n` plus `shellcheck`
@@ -45,13 +48,17 @@ git/        .gitconfig, .gitignore_global
 tmux/       .tmux.conf
 starship/   .starship.toml
 cship/      cship config (Claude Code statusline)
-cmux/       .config/cmux/cmux.json — cmux is the only terminal managed here
+cmux/       .config/cmux/cmux.json — the macOS terminal
+ghostty/    .config/ghostty/config — the Omarchy terminal (Linux only)
 k9s/        .config/k9s/ — config, skin, aliases, hotkeys, views, flux/stern plugins
 ssh/        ~/.ssh/config only — never keys
 misc/       .curlrc, .editorconfig, .inputrc, .wgetrc
-bin/        ~/.local/bin scripts (currently `dot`)
+bin/        ~/.local/bin scripts: `dot` (update), `arch-bundle` (Archfile installer)
 pi/         .pi/agent/settings.json + extensions/ — pi config and custom extensions
+mise/       .config/mise/config.toml — global mise tools (node, gh, claude, codex, pi)
+assets/     README logo (not stowed)
 Brewfile    brew + cask manifest
+Archfile    pacman / AUR / Omarchy-installer manifest, read by arch-bundle
 install.sh  idempotent installer (macOS + Linux)
 macos.sh    macOS system defaults — run manually, needs a reboot
 ```
@@ -59,8 +66,8 @@ macos.sh    macOS system defaults — run manually, needs a reboot
 ## Gotchas that will bite you
 
 **Two `PACKAGES` arrays exist and drift apart.** One in `install.sh`, one in
-`bin/.local/bin/dot`. Adding or renaming a stow package means editing both. They have
-silently diverged before.
+`bin/.local/bin/dot`, each with a `LINUX_PACKAGES` sibling. Adding or renaming a stow
+package means editing both files. They have silently diverged before.
 
 **A stow package with no files under a `$HOME`-shaped path stows nothing.** `cmux/`
 once held only a stow-ignored reference file, so the package was inert while the real
@@ -82,9 +89,16 @@ a silently ignored file. Check that log after editing any of them.
 `ssh $NAME` with the Kubernetes node name, which works only because `ssh/.ssh/config`
 defines `oracle`, `tank` and `cypher` with exactly those names.
 
-**cmux is the only terminal managed here.** Ghostty was replaced by cmux; don't
-reintroduce Ghostty config, casks, or packages. (cmux is Ghostty-backed internally,
-so the name still appears in cmux's own docs — that's fine.)
+**One terminal per OS: cmux on macOS, Ghostty on Omarchy.** Ghostty was replaced by
+cmux on macOS; don't reintroduce the Ghostty cask. (cmux is Ghostty-backed internally,
+so the name still appears in cmux's own docs — that's fine.) On Omarchy the Archfile
+installs Ghostty through `omarchy-install-terminal`, and the `ghostty` package is
+stowed on Linux only: its config imports Omarchy's live theme
+(`~/.local/state/omarchy/current/theme/ghostty.conf`), which doesn't exist on macOS.
+It started as Omarchy's stock config (`/usr/share/omarchy/config/ghostty/config`), so
+diff against that to see what's actually customized. `omarchy refresh config
+ghostty/config` copies the stock file through the symlink, overwriting the tracked one;
+check `git diff` after it. Validate edits with `ghostty +validate-config`.
 
 **`DOTFILES` is a fixed constant (`$HOME/.dotfiles`), deliberately not derived from
 `BASH_SOURCE`.** Leave it that way; deriving it broke curl-piped installs.
@@ -97,6 +111,19 @@ would collide get moved to `~/.backup/dotfiles_<timestamp>/`. Don't bypass
 fresh machines. Say so explicitly rather than implying something got removed. Do not
 run `brew bundle cleanup` — this machine intentionally has many apps outside the
 Brewfile, and cleanup would remove them.
+
+**The Linux path also covers Arch/Omarchy.** The `Archfile` is the Brewfile equivalent;
+`bin/.local/bin/arch-bundle` installs it (`install.sh` calls it by repo path because `bin`
+isn't stowed yet; `dot` calls it too). Add a package to the Brewfile and you probably want
+it in the Archfile too. Entries are `pacman`, `aur`, `omarchy <pkg> <installer> [args]`
+(runs `omarchy-<installer>` only when `<pkg>` is missing) and `ignore` (hides a package
+from `arch-bundle dump`). Like `brew bundle`, `arch-bundle` never uninstalls.
+Omarchy's defaults (`/usr/share/omarchy/install/omarchy-*.packages`) don't belong in the
+Archfile; `dump` filters them out. Node, gh, claude, codex and pi come from mise on
+Omarchy: `mise/.config/mise/config.toml` is stowed, so `mise use -g` edits the tracked
+file, and `install_mise_tools` runs before `install_pi` so pi comes from mise, not npm. Nothing machine-specific goes into
+`git/.gitconfig`: the credential helper is written to the untracked `~/.gitconfig.local`,
+and the editor comes from `EDITOR`/`GIT_EDITOR` in `zsh/.exports`.
 
 **`zsh/.extra` is tracked in git.** Secrets go in `~/.localrc` (gitignored, sourced by
 `.zshrc` if present). Never put a token, key, or password in any tracked file here.

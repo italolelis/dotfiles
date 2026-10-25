@@ -58,9 +58,6 @@ alias sudo='sudo '
 # Get week number
 alias week='date +%V'
 
-# IP addresses
-alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
-
 # Canonical hex dump; some systems have this symlinked
 command -v hd > /dev/null || alias hd="hexdump -C"
 
@@ -118,6 +115,9 @@ if [[ $(uname -s) == Darwin ]]; then
   alias hidepath="defaults write com.apple.finder _FXShowPosixPathInTitle -bool false; killall Finder"
 
   # Networking (macOS-specific)
+  # Public IP. macOS-only: on Linux `ip` is iproute2 and must not be shadowed;
+  # use `myip` there.
+  alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
   alias localip="ipconfig getifaddr en0"
   alias ips="ifconfig -a | grep -o 'inet6\? \(addr:\)\?\s\?\(\(\([0-9]\+\.\)\{3\}[0-9]\+\)\|[a-fA-F0-9:]\+\)' | awk '{ sub(/inet6? (addr:)? ?/, \"\"); print }'"
   alias ifactive="ifconfig | pcregrep -M -o '^[^\t:]+:([^\n]|\n\t)*status: active'"
