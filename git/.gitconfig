@@ -10,7 +10,8 @@
 
 [core]
 	excludesfile = ~/.gitignore_global
-    editor = cursor --wait
+	# editor removed 2026-10-23: comes from GIT_EDITOR/EDITOR in zsh/.exports,
+	# which picks cursor where installed and nvim elsewhere (Linux).
 	filemode = false
 	trustctime = false
 	autocrlf = input
@@ -21,8 +22,8 @@
 [pull]
 	rebase = true
 
-[credential]
-	helper = osxkeychain
+# credential.helper moved 2026-10-23 to the untracked ~/.gitconfig.local
+# (written by install.sh): osxkeychain on macOS, libsecret on Linux.
 
 [gpg]
 	format = ssh
@@ -91,3 +92,7 @@
 	changes = diff --name-only
 	staged = diff --cached --name-only
 	unmerged = diff --name-only --diff-filter=U
+
+# Machine-specific overrides (untracked, written by install.sh). Last, so it wins.
+[include]
+	path = ~/.gitconfig.local

@@ -6,8 +6,15 @@ export LANG='en_US.UTF-8'
 export LC_ALL='en_US.UTF-8'
 
 # Default applications
-export EDITOR="cursor"
-export VISUAL="cursor"
+if command -v cursor &>/dev/null; then
+  export EDITOR="cursor"
+  export VISUAL="cursor"
+  # git needs to block until the file is closed
+  export GIT_EDITOR="cursor --wait"
+else
+  export EDITOR="nvim"
+  export VISUAL="nvim"
+fi
 export PAGER="less"
 
 # SSH agent: Proton Pass (pass-cli ssh-agent; ssh itself finds it through

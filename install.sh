@@ -71,6 +71,35 @@ run_brew_bundle() {
   fi
 }
 
+# ── Arch / Omarchy ─────────────────────────────────────────────────────────────
+# Brewfile equivalents for Arch. Omarchy already ships git, fzf, starship, tmux,
+# mise (which provides node and gh) and docker, so they are not repeated here.
+ARCH_PACKAGES=(
+  zsh stow jq tree unarchiver wget httpie bind lsof shellcheck
+  git-delta diff-so-fancy go uv
+  kubectl kubectx k9s helm stern
+)
+# AUR: flux backs the k9s plugins; pass-cli serves the SSH keys.
+ARCH_AUR_PACKAGES=(flux-bin proton-pass-cli-bin)
+
+arch_install_packages() {
+  info "Installing packages (Arch)..."
+  if command -v omarchy &>/dev/null; then
+    omarchy pkg add "${ARCH_PACKAGES[@]}"
+  else
+    sudo pacman -S --needed --noconfirm "${ARCH_PACKAGES[@]}"
+  fi
+  ok "pacman packages"
+
+  if command -v yay &>/dev/null; then
+    yay -S --needed --noconfirm "${ARCH_AUR_PACKAGES[@]}" \
+      || log "[warn] some AUR packages failed — review output above"
+    ok "AUR packages"
+  else
+    log "[warn] yay not found — skipping AUR packages: ${ARCH_AUR_PACKAGES[*]}"
+  fi
+}
+
 # ── Linux Setup ───────────────────────────────────────────────────────────────
 linux_require_zsh() {
   info "Checking zsh (Linux)..."
@@ -295,6 +324,39 @@ stow_packages() {
   done
 }
 
+# ── Git credential helper ──────────────────────────────────────────────────────
+# The helper is platform-specific, so it lives in the untracked
+# ~/.gitconfig.local (included by git/.gitconfig) rather than the tracked file.
+configure_git_credentials() {
+  info "Checking git credential helper..."
+  local local_config="$HOME/.gitconfig.local"
+  if git config --file "$local_config" credential.helper &>/dev/null; then
+    ok "credential.helper already set in $local_config"
+    return 0
+  fi
+  local helper=""
+  if $IS_MACOS; then
+    helper="osxkeychain"
+  elif [[ -x /usr/lib/git-core/git-credential-libsecret ]]; then
+    helper="/usr/lib/git-core/git-credential-libsecret"
+  fi
+  if [[ -n "$helper" ]]; then
+    git config --file "$local_config" credential.helper "$helper"
+    ok "credential.helper = $helper"
+  else
+    log "No credential helper available — skipping"
+  fi
+}
+
+# ── Login shell ────────────────────────────────────────────────────────────────
+check_login_shell() {
+  local zsh_path
+  zsh_path="$(command -v zsh || true)"
+  if [[ -n "$zsh_path" ]] && [[ "$(getent passwd "$USER" 2>/dev/null | cut -d: -f7)" != "$zsh_path" ]]; then
+    log "[warn] login shell is not zsh — run: chsh -s $zsh_path"
+  fi
+}
+
 # ── Proton Pass SSH agent ──────────────────────────────────────────────────────
 # SSH keys live in the Proton Pass vault "SSH Keys". pass-cli serves them on
 # ~/.ssh/proton-pass-agent.sock, which ssh/.ssh/config (IdentityAgent) and
@@ -351,6 +413,9 @@ EOF
       ok "SSH agent starts at login ($label)"
     fi
   elif $IS_LINUX && command -v systemctl &>/dev/null; then
+    # pass-cli 2.4.2 fails the first `pass-cli login` ("Error opening temp
+    # session file") when its data dir does not exist yet.
+    mkdir -p "$HOME/.local/share/proton-pass-cli" && chmod 700 "$HOME/.local/share/proton-pass-cli"
     local unit="proton-pass-ssh-agent.service"
     if systemctl --user is-enabled "$unit" &>/dev/null; then
       ok "SSH agent already enabled ($unit)"
@@ -397,6 +462,10 @@ main() {
     run_brew_bundle
     install_cship
   elif $IS_LINUX; then
+    # On Arch this installs zsh and stow, so the apt-based checks below no-op.
+    if command -v pacman &>/dev/null; then
+      arch_install_packages
+    fi
     linux_require_zsh
     linux_require_stow
     linux_install_antidote
@@ -405,8 +474,12 @@ main() {
     install_cship
   fi
 
+  # ~/.ssh must stay private; create it before stow would make it 755.
+  mkdir -p "$HOME/.ssh" && chmod 700 "$HOME/.ssh"
   stow_packages
+  configure_git_credentials
   install_proton_ssh_agent
+  check_login_shell
 
   # After stowing: ~/.pi/agent/settings.json is a symlink into this repo by
   # now, so `pi install` records new packages in the tracked file rather than
