@@ -5,7 +5,10 @@ set -euo pipefail
 # Use a fixed constant — do NOT derive from BASH_SOURCE (see RESEARCH.md Pitfall 7)
 DOTFILES="$HOME/.dotfiles"
 BACKUP_DIR="$HOME/.backup/dotfiles_$(date +%Y%m%d_%H%M%S)"
-PACKAGES=(zsh git tmux starship cship cmux k9s pi ssh misc bin)
+PACKAGES=(zsh git tmux starship cship cmux k9s pi mise ssh misc bin)
+# Linux only: Ghostty is the Omarchy terminal. On macOS cmux is Ghostty-backed, and
+# this config imports an Omarchy theme path that does not exist there.
+LINUX_PACKAGES=(ghostty)
 # Single source of truth for pi's extension list, theme, and default model.
 # Read straight from the repo so it works before the pi package is stowed.
 PI_SETTINGS="$DOTFILES/pi/.pi/agent/settings.json"
@@ -72,32 +75,24 @@ run_brew_bundle() {
 }
 
 # ── Arch / Omarchy ─────────────────────────────────────────────────────────────
-# Brewfile equivalents for Arch. Omarchy already ships git, fzf, starship, tmux,
-# mise (which provides node and gh) and docker, so they are not repeated here.
-ARCH_PACKAGES=(
-  zsh stow jq tree unarchiver wget httpie bind lsof shellcheck
-  git-delta diff-so-fancy go uv
-  kubectl kubectx k9s helm stern
-)
-# AUR: flux backs the k9s plugins; pass-cli serves the SSH keys.
-ARCH_AUR_PACKAGES=(flux-bin proton-pass-cli-bin)
-
+# The Archfile is the Brewfile for Arch; arch-bundle installs whatever it lists
+# that is missing. Run from the repo path: bin/ is not stowed yet.
 arch_install_packages() {
-  info "Installing packages (Arch)..."
-  if command -v omarchy &>/dev/null; then
-    omarchy pkg add "${ARCH_PACKAGES[@]}"
-  else
-    sudo pacman -S --needed --noconfirm "${ARCH_PACKAGES[@]}"
-  fi
-  ok "pacman packages"
+  info "Running arch-bundle..."
+  "$DOTFILES/bin/.local/bin/arch-bundle" install \
+    || log "[warn] some Archfile entries failed — review output above"
+}
 
-  if command -v yay &>/dev/null; then
-    yay -S --needed --noconfirm "${ARCH_AUR_PACKAGES[@]}" \
-      || log "[warn] some AUR packages failed — review output above"
-    ok "AUR packages"
-  else
-    log "[warn] yay not found — skipping AUR packages: ${ARCH_AUR_PACKAGES[*]}"
-  fi
+# Global mise tools (node, gh, claude, codex, pi) from the stowed
+# ~/.config/mise/config.toml. Omarchy ships mise; macOS gets these from brew.
+install_mise_tools() {
+  command -v mise &>/dev/null || return 0
+  info "Installing mise tools..."
+  mise install || log "[warn] some mise tools failed — review output above"
+  # This script never sources zsh's mise activation; the shims make node, npm
+  # and pi visible to install_pi below.
+  export PATH="$HOME/.local/share/mise/shims:$PATH"
+  ok "mise tools"
 }
 
 # ── Linux Setup ───────────────────────────────────────────────────────────────
@@ -319,7 +314,9 @@ stow_package() {
 }
 
 stow_packages() {
-  for pkg in "${PACKAGES[@]}"; do
+  local pkgs=("${PACKAGES[@]}")
+  if $IS_LINUX; then pkgs+=("${LINUX_PACKAGES[@]}"); fi
+  for pkg in "${pkgs[@]}"; do
     stow_package "$pkg"
   done
 }
@@ -480,6 +477,7 @@ main() {
   configure_git_credentials
   install_proton_ssh_agent
   check_login_shell
+  install_mise_tools
 
   # After stowing: ~/.pi/agent/settings.json is a symlink into this repo by
   # now, so `pi install` records new packages in the tracked file rather than

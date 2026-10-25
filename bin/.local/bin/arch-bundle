@@ -1,0 +1,155 @@
+#!/usr/bin/env bash
+# ~/.dotfiles/bin/.local/bin/arch-bundle — `brew bundle` for Arch / Omarchy
+# Usage: arch-bundle [install|check|dump]
+#   install  install every Archfile entry that is missing (default)
+#   check    list missing entries; exit 1 if any
+#   dump     list explicitly installed packages that neither the Archfile nor
+#            Omarchy's defaults mention, as lines ready to paste into the Archfile
+set -euo pipefail
+
+DOTFILES="$HOME/.dotfiles"
+ARCHFILE="${ARCHFILE:-$DOTFILES/Archfile}"
+OMARCHY_PACKAGES=(/usr/share/omarchy/install/omarchy-*.packages)
+
+log()  { echo "  $1"; }
+info() { echo ""; echo "==> $1"; }
+ok()   { echo "  [ok] $1"; }
+warn() { echo "  [warn] $1" >&2; }
+fail() { echo "  [fail] $1" >&2; exit 1; }
+
+command -v pacman &>/dev/null || fail "pacman not found — arch-bundle is for Arch / Omarchy"
+[[ -f "$ARCHFILE" ]] || fail "Archfile not found at $ARCHFILE"
+
+# ── Parse ──────────────────────────────────────────────────────────────────────
+PACMAN=()
+AUR=()
+IGNORE=()
+OMARCHY=()  # "<pkg> <installer> [args]" per entry
+
+while IFS= read -r line || [[ -n "$line" ]]; do
+  line="${line%%#*}"
+  read -r kind pkg rest <<<"$line" || true
+  [[ -n "${kind:-}" ]] || continue
+  [[ -n "${pkg:-}" ]] || fail "Archfile: '$kind' needs a package name"
+  case "$kind" in
+    pacman)  PACMAN+=("$pkg") ;;
+    aur)     AUR+=("$pkg") ;;
+    ignore)  IGNORE+=("$pkg") ;;
+    omarchy)
+      [[ -n "${rest:-}" ]] || fail "Archfile: 'omarchy $pkg' needs an installer, e.g. install-terminal ghostty"
+      OMARCHY+=("$pkg $rest")
+      ;;
+    *) fail "Archfile: unknown entry '$kind' (expected pacman, aur, omarchy or ignore)" ;;
+  esac
+done <"$ARCHFILE"
+
+installed() { pacman -Q -- "$1" &>/dev/null; }
+
+missing_of() {
+  local pkg
+  for pkg in "$@"; do
+    installed "$pkg" || echo "$pkg"
+  done
+}
+
+# ── install ────────────────────────────────────────────────────────────────────
+cmd_install() {
+  local missing failed=false
+
+  info "pacman packages..."
+  mapfile -t missing < <(missing_of "${PACMAN[@]}")
+  if (( ${#missing[@]} == 0 )); then
+    ok "all ${#PACMAN[@]} installed"
+  elif command -v omarchy-pkg-add &>/dev/null; then
+    omarchy-pkg-add "${missing[@]}" || { warn "some pacman packages failed — review output above"; failed=true; }
+  else
+    sudo pacman -S --needed --noconfirm -- "${missing[@]}" || { warn "some pacman packages failed"; failed=true; }
+  fi
+
+  info "AUR packages..."
+  mapfile -t missing < <(missing_of "${AUR[@]}")
+  if (( ${#missing[@]} == 0 )); then
+    ok "all ${#AUR[@]} installed"
+  elif command -v yay &>/dev/null; then
+    yay -S --needed --noconfirm -- "${missing[@]}" || { warn "some AUR packages failed — review output above"; failed=true; }
+  else
+    warn "yay not found — skipping: ${missing[*]}"
+    failed=true
+  fi
+
+  info "Omarchy installers..."
+  local entry pkg installer args
+  for entry in "${OMARCHY[@]}"; do
+    read -r pkg installer args <<<"$entry"
+    if installed "$pkg"; then
+      ok "$pkg"
+    elif command -v "omarchy-$installer" &>/dev/null; then
+      log "Installing $pkg: omarchy-$installer${args:+ $args}"
+      # shellcheck disable=SC2086 # args are words from the Archfile
+      "omarchy-$installer" $args || { warn "omarchy-$installer failed"; failed=true; }
+    else
+      warn "omarchy-$installer not found — is this Omarchy? Skipping $pkg"
+      failed=true
+    fi
+  done
+
+  $failed && return 1
+  ok "Archfile satisfied"
+}
+
+# ── check ──────────────────────────────────────────────────────────────────────
+cmd_check() {
+  local entry pkg rest missing=()
+  for pkg in "${PACMAN[@]}"; do installed "$pkg" || missing+=("pacman  $pkg"); done
+  for pkg in "${AUR[@]}"; do installed "$pkg" || missing+=("aur     $pkg"); done
+  for entry in "${OMARCHY[@]}"; do
+    read -r pkg rest <<<"$entry"
+    installed "$pkg" || missing+=("omarchy $pkg")
+  done
+
+  if (( ${#missing[@]} == 0 )); then
+    ok "Everything in the Archfile is installed"
+    return 0
+  fi
+  echo "Missing from this machine (run \`arch-bundle\` to install):"
+  printf '  %s\n' "${missing[@]}"
+  return 1
+}
+
+# ── dump ───────────────────────────────────────────────────────────────────────
+cmd_dump() {
+  local known entry pkg
+  known="$(
+    printf '%s\n' "${PACMAN[@]}" "${AUR[@]}" "${IGNORE[@]}"
+    for entry in "${OMARCHY[@]}"; do echo "${entry%% *}"; done
+    # Omarchy's own package lists: what a fresh install already has.
+    [[ -e "${OMARCHY_PACKAGES[0]}" ]] && grep -hvE '^[[:space:]]*(#|$)' "${OMARCHY_PACKAGES[@]}"
+  )"
+
+  local foreign extra=()
+  foreign="$(pacman -Qqm)"
+  while IFS= read -r pkg; do
+    grep -qxF -- "$pkg" <<<"$known" && continue
+    if grep -qxF -- "$pkg" <<<"$foreign"; then
+      extra+=("aur    $pkg")
+    else
+      extra+=("pacman $pkg")
+    fi
+  done < <(pacman -Qqe)
+
+  if (( ${#extra[@]} == 0 )); then
+    ok "Nothing installed outside the Archfile and Omarchy's defaults"
+    return 0
+  fi
+  echo "# Installed here but not in the Archfile. Add what you want to keep;"
+  echo "# mark the rest \`ignore <pkg>\` so dump stops listing it."
+  printf '%s\n' "${extra[@]}"
+}
+
+case "${1:-install}" in
+  install) cmd_install ;;
+  check)   cmd_check ;;
+  dump)    cmd_dump ;;
+  -h|--help|help) sed -n '2,7p' "$0" | sed 's/^# \{0,1\}//' ;;
+  *) fail "unknown command '$1' — expected install, check or dump" ;;
+esac

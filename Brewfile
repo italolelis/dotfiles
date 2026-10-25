@@ -4,6 +4,7 @@ brew "fzf"
 brew "gh"
 brew "httpie"
 brew "jq"
+brew "sops"           # encrypted secrets; in the Archfile too
 brew "stow"           # Required for dotfiles management
 brew "tree"
 brew "unar"

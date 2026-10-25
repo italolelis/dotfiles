@@ -1,0 +1,72 @@
+# Archfile — the Brewfile for Arch / Omarchy.
+#
+# `arch-bundle` reads this file (bin/.local/bin/arch-bundle):
+#   arch-bundle           install anything below that is missing
+#   arch-bundle check     list what is missing; exit 1 if anything is
+#   arch-bundle dump      list installed packages this file doesn't mention
+#
+# One entry per line, `#` starts a comment:
+#   pacman  <pkg>                       official repos (and Omarchy's own repo)
+#   aur     <pkg>                       AUR, via yay
+#   omarchy <pkg> <installer> [args]    run `omarchy-<installer> [args]` when <pkg> is
+#                                       missing; for apps Omarchy sets up beyond the package
+#   ignore  <pkg>                       installed on purpose but not bundled; hides it from `dump`
+#
+# Omarchy already ships git, fzf, starship, tmux, docker, mise and yay, so they are not
+# repeated here. Node, gh, claude, codex and pi come from mise (mise/.config/mise/config.toml).
+
+# ── CLI tools ──────────────────────────────────────────────────────────────────
+pacman zsh
+pacman stow           # required for dotfiles management
+pacman jq
+pacman tree
+pacman unarchiver
+pacman wget
+pacman httpie
+pacman bind           # dig, nslookup
+pacman lsof
+pacman sops           # encrypted secrets; in the Brewfile too
+
+# ── Development ────────────────────────────────────────────────────────────────
+pacman git-delta
+pacman diff-so-fancy
+pacman go
+pacman uv
+pacman shellcheck
+
+# ── Kubernetes: homelab k3s cluster, GitOps via Flux ───────────────────────────
+# flux and stern back the k9s plugins; removing either leaves dead keybindings.
+pacman kubectl
+pacman kubectx
+pacman k9s
+pacman helm
+pacman stern
+aur    flux-bin
+
+# ── Secrets ────────────────────────────────────────────────────────────────────
+# pass-cli serves the SSH keys and lets agents fetch secrets (see install.sh).
+aur    proton-pass-cli-bin
+
+# ── Apps ───────────────────────────────────────────────────────────────────────
+pacman discord
+pacman proton-vpn-cli
+pacman zen-browser-bin
+aur    hyprmoncfg-bin                          # monitor layouts + auto-switching
+omarchy ghostty    install-terminal ghostty    # also makes it the default terminal
+omarchy steam      install-gaming-steam        # installs the right lib32 GPU drivers first
+omarchy voxtype-bin voxtype-install            # dictation: downloads the model, sets up the service
+
+# ── Not bundled ────────────────────────────────────────────────────────────────
+# Installer and hardware packages: the Omarchy ISO picks these per machine.
+ignore amd-ucode
+ignore efibootmgr
+ignore mkinitcpio
+ignore sudo
+ignore omarchy
+ignore omarchy-keyring
+ignore omarchy-settings
+# Build dependencies for OpenPods (AirPods controller, built from source).
+ignore cmake
+ignore ninja
+ignore qt6-connectivity
+ignore qt6-tools
