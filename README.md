@@ -1,83 +1,182 @@
-# Dotfiles
+<p align="center">
+  <img src="assets/logo.svg" alt="dotfiles: a happy moving box with colorful dots bouncing out" width="720">
+</p>
 
-My macOS (and Linux fallback) setup, managed with [GNU Stow](https://www.gnu.org/software/stow/) and a [`Brewfile`](./Brewfile).
+<p align="center">
+  My shell, git, terminal and agent setup for <b>macOS</b> and <b>Omarchy</b> (Arch).<br>
+  One command sets up a new machine. Another keeps it up to date.
+</p>
 
-## One-shot install
+---
 
-On a fresh Mac (after installing Xcode CLT — happens automatically the first time you run `git`):
+## Quick start
+
+On a **fresh Mac** (the first `git` call installs the Xcode command-line tools):
 
 ```zsh
 git clone https://github.com/italolelis/dotfiles.git ~/.dotfiles && ~/.dotfiles/install.sh --force
 ```
 
-That single command will:
+On a **fresh Omarchy** (run it from a terminal, since it asks for `sudo`):
 
-1. Install Homebrew if missing
-2. Install GNU Stow
-3. Run `brew bundle` against [`Brewfile`](./Brewfile) (CLI tools + casks)
-4. Install [`cship`](https://cship.dev)
-5. Stow every package (`zsh`, `git`, `tmux`, `starship`, `cship`, `cmux`, `k9s`, `pi`, `ssh`, `misc`, `bin`) into `$HOME`, backing up any conflicting regular files to `~/.backup/dotfiles_<timestamp>/`
-6. Install [`pi`](https://github.com/earendil-works/pi-coding-agent) plus every extension listed in the now-stowed `~/.pi/agent/settings.json`
+```zsh
+git clone https://github.com/italolelis/dotfiles.git ~/.dotfiles && ~/.dotfiles/install.sh --force
+chsh -s /usr/bin/zsh   # Omarchy logs in to bash by default
+```
 
-After it finishes, restart your shell (or `source ~/.zshrc`).
+Then open a new terminal. Then work through the [one-time setup](#one-time-setup).
 
-## Post-install
+> [!TIP]
+> `install.sh` is safe to re-run. It skips anything already installed, and it moves any real file it would overwrite to `~/.backup/dotfiles_<timestamp>/` first.
 
-- **macOS defaults** — run once, reboot after:
+## What the installer does
 
-  ```zsh
-  ~/.dotfiles/macos.sh
-  ```
+| Step | macOS | Omarchy |
+|---|---|---|
+| **Packages** | `brew bundle` from the [`Brewfile`](./Brewfile) | `arch-bundle` from the [`Archfile`](./Archfile) |
+| **Shell** | zsh, [antidote](https://github.com/mattmc3/antidote) plugins, [starship](https://starship.rs) prompt | same |
+| **Config** | symlinks every package (`zsh`, `git`, `tmux`, `k9s`, …) into `$HOME` with [GNU Stow](https://www.gnu.org/software/stow/) | same |
+| **Dev tools** | node and gh from brew | node, gh, claude, codex and pi from [mise](https://mise.jdx.dev) |
+| **Agents** | [pi](https://github.com/earendil-works/pi-coding-agent) plus its extensions, [cship](https://cship.dev) status line | same |
+| **SSH keys** | Proton Pass SSH agent, started at login (LaunchAgent) | same (systemd user unit) |
 
-- **SSH key for GitHub** — generate and add to your account:
+## Day to day
 
-  ```zsh
-  ssh-keygen -t ed25519 -C "you@example.com"
-  gh auth login        # or paste ~/.ssh/id_ed25519.pub into GitHub manually
-  ```
+| I want to… | Run |
+|---|---|
+| Pull the latest config and install anything new | `dot` |
+| See what's missing on this machine (Omarchy) | `arch-bundle check` |
+| See what I installed but haven't saved (Omarchy) | `arch-bundle dump` |
+| See what's missing on this machine (macOS) | `brew bundle check --file=~/.dotfiles/Brewfile --verbose` |
+| Upgrade the whole system (Omarchy) | `omarchy-update` |
+| Re-run the full installer | `~/.dotfiles/install.sh --force` |
 
-  Then switch the dotfiles remote to SSH:
+`dot` runs `git pull`, re-links every package, updates antidote plugins, then installs what's new: brew upgrades on macOS, and `arch-bundle` plus `mise install` on Omarchy.
 
+## Keeping a new app
+
+Installed something you want on every machine? Save it here, or it only exists on this one.
+
+**On macOS**, add a line to the [`Brewfile`](./Brewfile):
+
+```ruby
+brew "ripgrep"
+cask "obsidian"
+```
+
+**On Omarchy**, let `arch-bundle` find it for you:
+
+```zsh
+arch-bundle dump
+```
+
+```text
+# Installed here but not in the Archfile. Add what you want to keep;
+# mark the rest `ignore <pkg>` so dump stops listing it.
+pacman obsidian
+aur    some-tool-bin
+```
+
+Paste the lines you want into the [`Archfile`](./Archfile) and commit. `dump` already skips everything Omarchy installs by default, so the list is only what *you* added.
+
+**mise tools** (Omarchy) save themselves: `~/.config/mise/config.toml` is a symlink into this repo, so `mise use -g <tool>` edits the tracked file. Commit the change.
+
+> [!NOTE]
+> Neither `brew bundle` nor `arch-bundle` uninstalls anything. Deleting a line only stops new machines from getting it. Remove it from this machine yourself.
+
+### The Archfile format
+
+One entry per line, `#` starts a comment:
+
+```bash
+pacman  sops                                  # official repos, and Omarchy's own repo
+aur     flux-bin                              # AUR, through yay
+omarchy ghostty install-terminal ghostty      # runs omarchy-install-terminal ghostty if ghostty is missing
+ignore  cmake                                 # installed on purpose, never bundled; dump stays quiet
+```
+
+Use `omarchy` when Omarchy has an installer that does more than install the package. For example, `install-terminal` also makes Ghostty the default terminal, and `install-gaming-steam` installs the right GPU drivers first. Browse them with `ls /usr/share/omarchy/bin | grep install`.
+
+## One-time setup
+
+After the first install, by hand:
+
+- [ ] **Proton Pass**: run `pass-cli login`. The SSH agent serves your keys from the "SSH Keys" vault after that. Until then, ssh can only use key files in `~/.ssh`.
+- [ ] **GitHub**: run `gh auth login`, then switch this repo to SSH:
   ```zsh
   git -C ~/.dotfiles remote set-url origin git@github.com:italolelis/dotfiles.git
   ```
+- [ ] **macOS defaults**: run `~/.dotfiles/macos.sh`, then reboot.
+- [ ] **Omarchy login shell**: run `chsh -s /usr/bin/zsh`. The installer warns you if you skipped this.
 
-- **pi** — `pi/.pi/agent/settings.json` is stowed to `~/.pi/agent/settings.json` and carries the package list, theme, and default model. The installer parses it and runs `pi install <spec>` for anything missing, so a fresh machine gets the same setup. Custom extensions (e.g. the Claude Code-style status line) live in `pi/.pi/agent/extensions/`.
+## Secrets: where they go
 
-  Since the settings file is a symlink into this repo, `pi install` / `pi remove` edit the tracked file directly — extension changes show up in `git status`. Keep specs unversioned so `pi update --extensions` can move them forward.
+This repo is **public**. Nothing secret is ever committed.
 
-  `~/.pi/agent/auth.json` and `~/.pi/agent/mcp.json` hold live credentials and are **never** tracked.
+| What | Where |
+|---|---|
+| Tokens, API keys, work env vars | `~/.localrc` (untracked, sourced by `.zshrc`) |
+| SSH private keys | Proton Pass, never on disk or in `ssh/` |
+| Real hostnames, IPs, ssh users | `~/.ssh/config.local` (untracked, included by `ssh/.ssh/config`) |
+| Machine-specific git settings | `~/.gitconfig.local` (untracked, included by `git/.gitconfig`) |
+| pi credentials | `~/.pi/agent/auth.json`, `~/.pi/agent/mcp.json` (never tracked) |
 
-- **Local-only secrets** — put env vars, tokens, work-specific config into `~/.localrc` (sourced by `~/.zshrc` if present). **Never** put secrets in `zsh/.extra` — that file is tracked in this repo.
-- **SSH keys** live in Proton Pass (vault "SSH Keys"), served by `pass-cli`'s SSH agent, which `install.sh` starts at login. Run `pass-cli login` once on a new machine; until then ssh falls back to any key files in `~/.ssh`.
+`zsh/.extra` *looks* like a place for secrets, but it is tracked.
 
-## Layout
+## How it works
 
+Each top-level folder is a **stow package** whose contents mirror `$HOME`. Stow symlinks them into place:
+
+```text
+~/.dotfiles/zsh/.zshrc                       →  ~/.zshrc
+~/.dotfiles/mise/.config/mise/config.toml    →  ~/.config/mise/config.toml
+~/.dotfiles/bin/.local/bin/arch-bundle       →  ~/.local/bin/arch-bundle
 ```
-zsh/        .zshrc, .aliases, .exports, .functions, .path, .extra, completions, antidote plugins
+
+Edit the file in the repo, or edit through the symlink. Either way the change shows up in `git status`.
+
+To add a new config, for example `~/.config/foo/config.toml`:
+
+1. Create `foo/.config/foo/config.toml` here.
+2. Add `foo` to `PACKAGES` in **both** `install.sh` and `bin/.local/bin/dot` (or to `LINUX_PACKAGES` if it only makes sense on Linux).
+3. Run `dot`.
+
+### Layout
+
+```text
+zsh/        .zshrc, .aliases, .exports, .functions, .path, .extra, antidote plugins
 git/        .gitconfig, .gitignore_global
 tmux/       .tmux.conf
-starship/   starship.toml
-cship/      cship config (Claude Code statusline)
-cmux/       cmux config (~/.config/cmux/cmux.json) — the only terminal managed here
-k9s/        k9s config (~/.config/k9s) — homelab k3s: skin, hotkeys, flux/stern plugins
-pi/         pi config: settings.json (theme, model, packages) + custom extensions
-ssh/        ~/.ssh/config (no keys)
-misc/       miscellaneous dotfiles
-bin/        ~/.local/bin scripts
-Brewfile    brew + cask package manifest
-install.sh  idempotent installer (macOS + Linux)
-macos.sh    macOS system defaults (run manually)
+starship/   .starship.toml
+cship/      Claude Code status line
+cmux/       cmux terminal config (macOS)
+ghostty/    Ghostty terminal config (Omarchy only; follows the Omarchy theme)
+k9s/        k9s config for the homelab cluster: skin, hotkeys, flux/stern plugins
+pi/         pi agent settings (theme, model, extensions) + custom extensions
+mise/       global mise tools: node, gh, claude, codex, pi
+ssh/        ~/.ssh/config only (no keys, no real hosts)
+misc/       .curlrc, .editorconfig, .inputrc, .wgetrc
+bin/        dot, arch-bundle
+assets/     the logo up top
+
+Brewfile    macOS packages          ┐
+Archfile    Omarchy packages        ├ not stowed
+install.sh  the installer           │
+macos.sh    macOS system defaults   ┘
 ```
 
-## Updating
+### pi
 
-```zsh
-cd ~/.dotfiles && git pull && ./install.sh --force
-```
+`pi/.pi/agent/settings.json` holds pi's extensions, theme and default model. The installer runs `pi install` for any extension that's missing. `pi install` and `pi remove` edit the tracked file, so extension changes show up in `git status`. Custom extensions are `.ts` files in `pi/.pi/agent/extensions/`. Drop a file in and pi picks it up.
 
-`install.sh` is idempotent — it uses `stow --restow` so re-running is safe.
+### Omarchy's own config
 
-## Linux
+Omarchy ships its own `~/.config/git/config`, `~/.config/tmux/tmux.conf` and `~/.config/starship.toml`. They stay in place, but `~/.gitconfig`, `~/.tmux.conf` and `STARSHIP_CONFIG` from this repo take precedence.
 
-`install.sh` also runs on Debian/Ubuntu: installs `zsh`, `stow`, `antidote`, `starship`, `fzf`, `cship`, and `pi` without Homebrew. Casks are skipped.
+### Debian / Ubuntu
+
+`install.sh` also works on apt-based systems. It installs zsh, stow, antidote, starship, fzf, cship and pi without Homebrew, and skips the GUI apps.
+
+---
+
+<sub>Generated with Claude AI — please review before distribution.</sub>
