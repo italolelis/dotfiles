@@ -176,7 +176,3 @@ Omarchy ships its own `~/.config/git/config`, `~/.config/tmux/tmux.conf` and `~/
 ### Debian / Ubuntu
 
 `install.sh` also works on apt-based systems. It installs zsh, stow, antidote, starship, fzf, cship and pi without Homebrew, and skips the GUI apps.
-
----
-
-<sub>Generated with Claude AI — please review before distribution.</sub>
