@@ -11,12 +11,14 @@ Each top-level directory is a **stow package**. Its internal structure mirrors `
 exactly. `bash/.bashrc` becomes `~/.bashrc`; `bin/.local/bin/dot` becomes
 `~/.local/bin/dot`.
 
-So: to add `~/.config/foo/bar.toml`, create `foo/.config/foo/bar.toml` and add `foo`
-to the `PACKAGES` arrays. Never create a file directly in `$HOME` and never write to a
+So: to add `~/.config/foo/bar.toml`, create `foo/.config/foo/bar.toml`. That is all:
+every top-level directory is a package unless `bin/.local/bin/dot-packages` lists it in
+`NOT_PACKAGES` (or in `LINUX_ONLY`, to skip it on macOS). Never create a file directly in `$HOME` and never write to a
 path that is already a symlink into this repo — edit the file here instead.
 
-Stowed packages: `bash git tmux starship cship cmux k9s pi mise ssh misc bin`, plus
-`ghostty hypr wave-xlr` on Linux only (`LINUX_PACKAGES`).
+`dot-packages` prints this machine's package list. The stow flags (`--target=~`,
+`--no-folding`, ignores) live in `.stowrc`, which stow reads from the **current
+directory** only: run stow from the repo root, or pass the flags yourself.
 
 Not stowed: `Brewfile`, `Archfile`, `install.sh`, `macos.sh`, `assets/` (README logo).
 
@@ -27,7 +29,7 @@ Not stowed: `Brewfile`, `Archfile`, `install.sh`, `macos.sh`, `assets/` (README 
 ~/.local/bin/dot                  # update: git pull + restow + brew/arch-bundle + mise
 bash -n install.sh                # syntax check
 shellcheck install.sh macos.sh bin/.local/bin/*   # lint (in the Brewfile and Archfile)
-stow -nv --target="$HOME" --dir=. <pkg>   # DRY RUN — show what stow would do
+stow -nv <pkg>                    # DRY RUN, from the repo root (.stowrc) — show what stow would do
 brew bundle check --file=Brewfile --verbose   # what's missing vs. the Brewfile
 arch-bundle check                 # what's missing vs. the Archfile (Arch)
 arch-bundle dump                  # installed here, but in neither the Archfile nor Omarchy's defaults
@@ -56,7 +58,7 @@ wave-xlr/   Elgato Wave XLR glue: `wave-xlr-volume` (volume keys → device head
 k9s/        .config/k9s/ — config, skin, aliases, hotkeys, views, flux/stern plugins
 ssh/        ~/.ssh/config only — never keys
 misc/       .curlrc, .editorconfig, .inputrc, .wgetrc
-bin/        ~/.local/bin scripts: `dot` (update), `arch-bundle` (Archfile installer)
+bin/        ~/.local/bin scripts: `dot` (update), `dot-packages` (package list), `arch-bundle` (Archfile installer)
 pi/         .pi/agent/settings.json + extensions/ — pi config and custom extensions
 mise/       .config/mise/config.toml — global mise tools (node, gh, claude, codex, pi)
 assets/     README logo (not stowed)
@@ -68,9 +70,10 @@ macos.sh    macOS system defaults — run manually, needs a reboot
 
 ## Gotchas that will bite you
 
-**Two `PACKAGES` arrays exist and drift apart.** One in `install.sh`, one in
-`bin/.local/bin/dot`, each with a `LINUX_PACKAGES` sibling. Adding or renaming a stow
-package means editing both files. They have silently diverged before.
+**Every top-level directory gets stowed.** `dot-packages` replaced two hand-kept
+`PACKAGES` arrays that had silently diverged. The flip side: a new top-level directory
+that is *not* a package (like `assets/`) must go in `NOT_PACKAGES`, or `dot` will
+symlink its contents into `$HOME`. Hidden directories (`.git`, `.vscode`) are skipped.
 
 **A stow package with no files under a `$HOME`-shaped path stows nothing.** `cmux/`
 once held only a stow-ignored reference file, so the package was inert while the real

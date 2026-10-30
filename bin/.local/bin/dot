@@ -3,10 +3,7 @@
 # Usage: dot
 set -euo pipefail
 
-DOTFILES="$HOME/.dotfiles"
-# Keep in sync with PACKAGES in ~/.dotfiles/install.sh
-PACKAGES=(bash git tmux starship cship cmux k9s pi mise ssh misc bin)
-LINUX_PACKAGES=(ghostty hypr wave-xlr)  # Keep in sync with LINUX_PACKAGES in install.sh
+export DOTFILES="$HOME/.dotfiles"  # exported for dot-packages
 
 PLATFORM="$(/usr/bin/uname -s)"
 IS_MACOS=false
@@ -27,14 +24,12 @@ ok "git pull"
 
 # 2. Restow all packages (prunes stale symlinks, creates new ones)
 info "Restowing packages..."
-pkgs=("${PACKAGES[@]}")
-if $IS_LINUX; then pkgs+=("${LINUX_PACKAGES[@]}"); fi
-for pkg in "${pkgs[@]}"; do
-  if [[ -d "$DOTFILES/$pkg" ]]; then
-    stow --restow --no-folding --target="$HOME" --dir="$DOTFILES" "$pkg"
-    ok "$pkg"
-  fi
-done
+# Package list from dot-packages, stow flags from .stowrc (read from the cwd).
+cd "$DOTFILES"
+while IFS= read -r pkg; do
+  stow --restow "$pkg"
+  ok "$pkg"
+done < <("$DOTFILES/bin/.local/bin/dot-packages")
 
 # 3. Update Homebrew (macOS only)
 if $IS_MACOS; then

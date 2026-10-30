@@ -3,13 +3,11 @@ set -euo pipefail
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 # Use a fixed constant — do NOT derive from BASH_SOURCE (see RESEARCH.md Pitfall 7)
-DOTFILES="$HOME/.dotfiles"
+export DOTFILES="$HOME/.dotfiles"  # exported for dot-packages
 BACKUP_DIR="$HOME/.backup/dotfiles_$(date +%Y%m%d_%H%M%S)"
-PACKAGES=(bash git tmux starship cship cmux k9s pi mise ssh misc bin)
-# Linux only: Ghostty is the Omarchy terminal. On macOS cmux is Ghostty-backed, and
-# this config imports an Omarchy theme path that does not exist there. hypr and
-# wave-xlr are Hyprland bindings and Elgato Wave XLR glue, both Omarchy-only.
-LINUX_PACKAGES=(ghostty hypr wave-xlr)
+# Which packages to stow is decided by dot-packages (every top-level dir, minus a
+# skip list); how to stow them by .stowrc. Run from the repo: bin/ is not stowed yet.
+DOT_PACKAGES="$DOTFILES/bin/.local/bin/dot-packages"
 # Single source of truth for pi's extension list, theme, and default model.
 # Read straight from the repo so it works before the pi package is stowed.
 PI_SETTINGS="$DOTFILES/pi/.pi/agent/settings.json"
@@ -271,19 +269,17 @@ stow_package() {
   # Back up any conflicting regular files before stowing
   backup_conflicts "$pkg"
 
-  stow --restow --no-folding \
-    --target="$HOME" \
-    --dir="$DOTFILES" \
-    "$pkg"
+  # Flags (--target=~, --no-folding) come from .stowrc, which stow only reads
+  # from the current directory, hence the cd.
+  (cd "$DOTFILES" && stow --restow "$pkg")
   ok "$pkg"
 }
 
 stow_packages() {
-  local pkgs=("${PACKAGES[@]}")
-  if $IS_LINUX; then pkgs+=("${LINUX_PACKAGES[@]}"); fi
-  for pkg in "${pkgs[@]}"; do
+  local pkg
+  while IFS= read -r pkg; do
     stow_package "$pkg"
-  done
+  done < <("$DOT_PACKAGES")
 }
 
 # ── Git credential helper ──────────────────────────────────────────────────────

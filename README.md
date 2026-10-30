@@ -138,8 +138,9 @@ Edit the file in the repo, or edit through the symlink. Either way the change sh
 To add a new config, for example `~/.config/foo/config.toml`:
 
 1. Create `foo/.config/foo/config.toml` here.
-2. Add `foo` to `PACKAGES` in **both** `install.sh` and `bin/.local/bin/dot` (or to `LINUX_PACKAGES` if it only makes sense on Linux).
-3. Run `dot`.
+2. Run `dot`.
+
+Every top-level folder is a package; `dot-packages` prints the list for this machine. Folders that aren't packages (`assets/`) or are Omarchy-only (`hypr/`) are listed in `bin/.local/bin/dot-packages`. Stow's flags live in [`.stowrc`](./.stowrc), so from the repo root a dry run is just `stow -nv foo`.
 
 ### Layout
 
@@ -158,7 +159,7 @@ pi/         pi agent settings (theme, model, extensions) + custom extensions
 mise/       global mise tools: node, gh, claude, codex, pi
 ssh/        ~/.ssh/config only (no keys, no real hosts)
 misc/       .curlrc, .editorconfig, .inputrc, .wgetrc
-bin/        dot, arch-bundle
+bin/        dot, dot-packages, arch-bundle
 assets/     the logo up top
 
 Brewfile    macOS packages          ┐
