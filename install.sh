@@ -375,9 +375,11 @@ EOF
       ok "SSH agent starts at login ($label)"
     fi
   elif $IS_LINUX && command -v systemctl &>/dev/null; then
-    # pass-cli 2.4.2 fails the first `pass-cli login` ("Error opening temp
-    # session file") when its data dir does not exist yet.
-    mkdir -p "$HOME/.local/share/proton-pass-cli" && chmod 700 "$HOME/.local/share/proton-pass-cli"
+    # `pass-cli login` fails after the browser step ("Error opening temp session
+    # file") when its session dir is missing: 2.4.2 needed the data dir, 2.5.1
+    # needs .session inside it too (seen 2026-10-30, after a re-login).
+    local pass_data="$HOME/.local/share/proton-pass-cli"
+    mkdir -p "$pass_data/.session" && chmod 700 "$pass_data" "$pass_data/.session"
     local unit="proton-pass-ssh-agent.service"
     if systemctl --user is-enabled "$unit" &>/dev/null; then
       ok "SSH agent already enabled ($unit)"
