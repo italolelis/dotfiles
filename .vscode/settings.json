@@ -15,7 +15,7 @@
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,
   "files.trimFinalNewlines": true,
-  "terminal.integrated.defaultProfile.osx": "zsh",
+  "terminal.integrated.defaultProfile.osx": "bash",
   "git.enableSmartCommit": true,
   "git.confirmSync": false,
   "git.autofetch": true,

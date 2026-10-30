@@ -16,7 +16,6 @@
 # repeated here. Node, gh, claude, codex and pi come from mise (mise/.config/mise/config.toml).
 
 # ── CLI tools ──────────────────────────────────────────────────────────────────
-pacman zsh
 pacman stow           # required for dotfiles management
 pacman jq
 pacman tree

@@ -13,15 +13,15 @@
 
 On a **fresh Mac** (the first `git` call installs the Xcode command-line tools):
 
-```zsh
+```bash
 git clone https://github.com/italolelis/dotfiles.git ~/.dotfiles && ~/.dotfiles/install.sh --force
+chsh -s /bin/bash   # macOS logs in to zsh by default
 ```
 
 On a **fresh Omarchy** (run it from a terminal, since it asks for `sudo`):
 
-```zsh
+```bash
 git clone https://github.com/italolelis/dotfiles.git ~/.dotfiles && ~/.dotfiles/install.sh --force
-chsh -s /usr/bin/zsh   # Omarchy logs in to bash by default
 ```
 
 Then open a new terminal. Then work through the [one-time setup](#one-time-setup).
@@ -34,8 +34,8 @@ Then open a new terminal. Then work through the [one-time setup](#one-time-setup
 | Step | macOS | Omarchy |
 |---|---|---|
 | **Packages** | `brew bundle` from the [`Brewfile`](./Brewfile) | `arch-bundle` from the [`Archfile`](./Archfile) |
-| **Shell** | zsh, [antidote](https://github.com/mattmc3/antidote) plugins, [starship](https://starship.rs) prompt | same |
-| **Config** | symlinks every package (`zsh`, `git`, `tmux`, `k9s`, …) into `$HOME` with [GNU Stow](https://www.gnu.org/software/stow/) | same |
+| **Shell** | bash, [starship](https://starship.rs) prompt from the `starship` package | bash on Omarchy's defaults (prompt, mise, fzf, zoxide, aliases) |
+| **Config** | symlinks every package (`bash`, `git`, `tmux`, `k9s`, …) into `$HOME` with [GNU Stow](https://www.gnu.org/software/stow/) | same |
 | **Dev tools** | node and gh from brew | node, gh, claude, codex and pi from [mise](https://mise.jdx.dev) |
 | **Agents** | [pi](https://github.com/earendil-works/pi-coding-agent) plus its extensions, [cship](https://cship.dev) status line | same |
 | **SSH keys** | Proton Pass SSH agent, started at login (LaunchAgent) | same (systemd user unit) |
@@ -51,7 +51,7 @@ Then open a new terminal. Then work through the [one-time setup](#one-time-setup
 | Upgrade the whole system (Omarchy) | `omarchy-update` |
 | Re-run the full installer | `~/.dotfiles/install.sh --force` |
 
-`dot` runs `git pull`, re-links every package, updates antidote plugins, then installs what's new: brew upgrades on macOS, and `arch-bundle` plus `mise install` on Omarchy.
+`dot` runs `git pull`, re-links every package, then installs what's new: brew upgrades on macOS, and `arch-bundle` plus `mise install` on Omarchy.
 
 ## Keeping a new app
 
@@ -66,7 +66,7 @@ cask "obsidian"
 
 **On Omarchy**, let `arch-bundle` find it for you:
 
-```zsh
+```bash
 arch-bundle dump
 ```
 
@@ -103,11 +103,11 @@ After the first install, by hand:
 
 - [ ] **Proton Pass**: run `pass-cli login`. The SSH agent serves your keys from the "SSH Keys" vault after that. Until then, ssh can only use key files in `~/.ssh`.
 - [ ] **GitHub**: run `gh auth login`, then switch this repo to SSH:
-  ```zsh
+  ```bash
   git -C ~/.dotfiles remote set-url origin git@github.com:italolelis/dotfiles.git
   ```
 - [ ] **macOS defaults**: run `~/.dotfiles/macos.sh`, then reboot.
-- [ ] **Omarchy login shell**: run `chsh -s /usr/bin/zsh`. The installer warns you if you skipped this.
+- [ ] **macOS login shell**: run `chsh -s /bin/bash`. The installer warns you if you skipped this.
 
 ## Secrets: where they go
 
@@ -115,20 +115,20 @@ This repo is **public**. Nothing secret is ever committed.
 
 | What | Where |
 |---|---|
-| Tokens, API keys, work env vars | `~/.localrc` (untracked, sourced by `.zshrc`) |
+| Tokens, API keys, work env vars | `~/.localrc` (untracked, sourced by `.bashrc`) |
 | SSH private keys | Proton Pass, never on disk or in `ssh/` |
 | Real hostnames, IPs, ssh users | `~/.ssh/config.local` (untracked, included by `ssh/.ssh/config`) |
 | Machine-specific git settings | `~/.gitconfig.local` (untracked, included by `git/.gitconfig`) |
 | pi credentials | `~/.pi/agent/auth.json`, `~/.pi/agent/mcp.json` (never tracked) |
 
-`zsh/.extra` *looks* like a place for secrets, but it is tracked.
+`bash/.bashrc` is tracked: never put a secret in it.
 
 ## How it works
 
 Each top-level folder is a **stow package** whose contents mirror `$HOME`. Stow symlinks them into place:
 
 ```text
-~/.dotfiles/zsh/.zshrc                       →  ~/.zshrc
+~/.dotfiles/bash/.bashrc                     →  ~/.bashrc
 ~/.dotfiles/mise/.config/mise/config.toml    →  ~/.config/mise/config.toml
 ~/.dotfiles/bin/.local/bin/arch-bundle       →  ~/.local/bin/arch-bundle
 ```
@@ -144,7 +144,7 @@ To add a new config, for example `~/.config/foo/config.toml`:
 ### Layout
 
 ```text
-zsh/        .zshrc, .aliases, .exports, .functions, .path, .extra, antidote plugins
+bash/       .bashrc (Omarchy's stock bashrc + essential exports), .bash_profile
 git/        .gitconfig, .gitignore_global
 tmux/       .tmux.conf
 starship/   .starship.toml
@@ -173,8 +173,8 @@ macos.sh    macOS system defaults   ┘
 
 ### Omarchy's own config
 
-Omarchy ships its own `~/.config/git/config`, `~/.config/tmux/tmux.conf` and `~/.config/starship.toml`. They stay in place, but `~/.gitconfig`, `~/.tmux.conf` and `STARSHIP_CONFIG` from this repo take precedence.
+Omarchy ships its own `~/.config/git/config`, `~/.config/tmux/tmux.conf` and `~/.config/starship.toml`. They stay in place, but `~/.gitconfig` and `~/.tmux.conf` from this repo take precedence. The prompt is Omarchy's `~/.config/starship.toml`; `starship/.starship.toml` is only used on macOS.
 
 ### Debian / Ubuntu
 
-`install.sh` also works on apt-based systems. It installs zsh, stow, antidote, starship, fzf, cship and pi without Homebrew, and skips the GUI apps.
+`install.sh` also works on apt-based systems. It installs stow, starship, fzf, cship and pi without Homebrew, and skips the GUI apps.

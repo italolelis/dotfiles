@@ -5,7 +5,7 @@ set -euo pipefail
 # Use a fixed constant — do NOT derive from BASH_SOURCE (see RESEARCH.md Pitfall 7)
 DOTFILES="$HOME/.dotfiles"
 BACKUP_DIR="$HOME/.backup/dotfiles_$(date +%Y%m%d_%H%M%S)"
-PACKAGES=(zsh git tmux starship cship cmux k9s pi mise ssh misc bin)
+PACKAGES=(bash git tmux starship cship cmux k9s pi mise ssh misc bin)
 # Linux only: Ghostty is the Omarchy terminal. On macOS cmux is Ghostty-backed, and
 # this config imports an Omarchy theme path that does not exist there. hypr and
 # wave-xlr are Hyprland bindings and Elgato Wave XLR glue, both Omarchy-only.
@@ -90,36 +90,13 @@ install_mise_tools() {
   command -v mise &>/dev/null || return 0
   info "Installing mise tools..."
   mise install || log "[warn] some mise tools failed — review output above"
-  # This script never sources zsh's mise activation; the shims make node, npm
+  # This script never sources the shell's mise activation; the shims make node, npm
   # and pi visible to install_pi below.
   export PATH="$HOME/.local/share/mise/shims:$PATH"
   ok "mise tools"
 }
 
 # ── Linux Setup ───────────────────────────────────────────────────────────────
-linux_require_zsh() {
-  info "Checking zsh (Linux)..."
-  if command -v zsh &>/dev/null; then
-    ok "zsh already installed: $(zsh --version)"
-    return 0
-  fi
-  if command -v apt-get &>/dev/null; then
-    log "Installing zsh via apt-get..."
-    if [[ "$(id -u)" -eq 0 ]]; then
-      apt-get update -qq && apt-get install -y zsh
-    elif command -v sudo &>/dev/null; then
-      sudo apt-get update -qq && sudo apt-get install -y zsh
-    else
-      log "No sudo access and zsh not found — stowing git config only"
-      stow_package git
-      exit 0
-    fi
-    ok "zsh installed"
-  else
-    fail "Cannot install zsh — apt-get not available and zsh not found"
-  fi
-}
-
 linux_require_stow() {
   info "Checking GNU Stow (Linux)..."
   if command -v stow &>/dev/null; then
@@ -139,19 +116,6 @@ linux_require_stow() {
   else
     fail "GNU Stow not found and apt-get unavailable. Install manually."
   fi
-}
-
-linux_install_antidote() {
-  info "Checking antidote (Linux)..."
-  if [[ -d "$HOME/.antidote" ]]; then
-    ok "antidote already at ~/.antidote"
-    return 0
-  fi
-  if ! command -v git &>/dev/null; then
-    fail "git is required to install antidote"
-  fi
-  git clone --depth=1 https://github.com/mattmc3/antidote.git "$HOME/.antidote"
-  ok "antidote installed at ~/.antidote"
 }
 
 linux_install_starship() {
@@ -195,9 +159,9 @@ install_pi() {
     ok "pi already installed: $(pi --version 2>/dev/null | head -1)"
   else
     log "Installing pi via npm..."
-    # zsh/.exports sets npm_config_prefix, but this script runs under bash and
+    # bash/.bashrc sets npm_config_prefix, but this script is non-interactive and
     # never sources it - without this, npm would install into Homebrew's prefix
-    # while ~/.npm-global/bin sits first on the zsh PATH, so a later `npm i -g`
+    # while ~/.npm-global/bin sits first on the shell PATH, so a later `npm i -g`
     # from an interactive shell would silently shadow this install.
     npm_config_prefix="$HOME/.npm-global" \
       npm install -g --ignore-scripts @earendil-works/pi-coding-agent
@@ -348,17 +312,21 @@ configure_git_credentials() {
 
 # ── Login shell ────────────────────────────────────────────────────────────────
 check_login_shell() {
-  local zsh_path
-  zsh_path="$(command -v zsh || true)"
-  if [[ -n "$zsh_path" ]] && [[ "$(getent passwd "$USER" 2>/dev/null | cut -d: -f7)" != "$zsh_path" ]]; then
-    log "[warn] login shell is not zsh — run: chsh -s $zsh_path"
+  local current
+  if $IS_MACOS; then
+    current="$(dscl . -read "/Users/$USER" UserShell 2>/dev/null | awk '{print $2}')"
+  else
+    current="$(getent passwd "$USER" 2>/dev/null | cut -d: -f7)"
+  fi
+  if [[ "${current##*/}" != bash ]]; then
+    log "[warn] login shell is ${current:-unknown}, not bash — run: chsh -s /bin/bash"
   fi
 }
 
 # ── Proton Pass SSH agent ──────────────────────────────────────────────────────
 # SSH keys live in the Proton Pass vault "SSH Keys". pass-cli serves them on
 # ~/.ssh/proton-pass-agent.sock, which ssh/.ssh/config (IdentityAgent) and
-# zsh/.exports (SSH_AUTH_SOCK) point at. It needs `pass-cli login` once.
+# bash/.bashrc (SSH_AUTH_SOCK) point at. It needs `pass-cli login` once.
 install_proton_ssh_agent() {
   info "Checking Proton Pass SSH agent..."
   local pass_cli
@@ -483,13 +451,11 @@ main() {
     run_brew_bundle
     install_cship
   elif $IS_LINUX; then
-    # On Arch this installs zsh and stow, so the apt-based checks below no-op.
+    # On Arch this installs stow, so the apt-based check below no-ops.
     if command -v pacman &>/dev/null; then
       arch_install_packages
     fi
-    linux_require_zsh
     linux_require_stow
-    linux_install_antidote
     linux_install_starship
     linux_install_fzf
     install_cship
@@ -513,7 +479,7 @@ main() {
   echo "=============================="
   echo "  Done! ($PLATFORM)"
   echo "  Restart your shell or run:"
-  echo "    source ~/.zshrc"
+  echo "    source ~/.bashrc"
   echo "=============================="
 }
 
