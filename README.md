@@ -34,7 +34,7 @@ Then open a new terminal. Then work through the [one-time setup](#one-time-setup
 | Step | macOS | Omarchy |
 |---|---|---|
 | **Packages** | `brew bundle` from the [`Brewfile`](./Brewfile) | `arch-bundle` from the [`Archfile`](./Archfile) |
-| **Shell** | bash, [starship](https://starship.rs) prompt from the `starship` package | bash on Omarchy's defaults (prompt, mise, fzf, zoxide, aliases) |
+| **Shell** | bash, [starship](https://starship.rs) prompt from the `starship` package | bash on Omarchy's defaults (mise, fzf, zoxide, aliases), same prompt |
 | **Config** | symlinks every package (`bash`, `git`, `tmux`, `k9s`, …) into `$HOME` with [GNU Stow](https://www.gnu.org/software/stow/) | same |
 | **Dev tools** | node and gh from brew | node, gh, claude, codex and pi from [mise](https://mise.jdx.dev) |
 | **Agents** | [pi](https://github.com/earendil-works/pi-coding-agent) plus its extensions, [cship](https://cship.dev) status line | same |
@@ -173,7 +173,7 @@ macos.sh    macOS system defaults   ┘
 
 ### Omarchy's own config
 
-Omarchy ships its own `~/.config/git/config`, `~/.config/tmux/tmux.conf` and `~/.config/starship.toml`. They stay in place, but `~/.gitconfig` and `~/.tmux.conf` from this repo take precedence. The prompt is Omarchy's `~/.config/starship.toml`; `starship/.starship.toml` is only used on macOS.
+Omarchy ships its own `~/.config/git/config`, `~/.config/tmux/tmux.conf` and `~/.config/starship.toml`. They stay in place, but `~/.gitconfig` and `~/.tmux.conf` from this repo take precedence. The prompt is `starship/.starship.toml` (via `STARSHIP_CONFIG`): Omarchy's look plus the kubernetes context and slow-command times.
 
 ### Debian / Ubuntu
 

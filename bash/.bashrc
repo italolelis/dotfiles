@@ -20,8 +20,6 @@ if [[ "$OSTYPE" == darwin* ]]; then
   done
   unset brew
   command -v mise &>/dev/null && eval "$(mise activate bash)"
-  # Omarchy has its own prompt; macOS uses the one from the starship package.
-  export STARSHIP_CONFIG="$HOME/.starship.toml"
   command -v starship &>/dev/null && eval "$(starship init bash)"
   command -v zoxide &>/dev/null && eval "$(zoxide init bash)"
   command -v fzf &>/dev/null && eval "$(fzf --bash)"
@@ -39,6 +37,11 @@ export PATH
 export npm_config_prefix="$HOME/.npm-global"
 # NODE_ENV is deliberately NOT set globally: a stray value makes bundlers resolve
 # dev-only exports in production builds (Next 16 rejects it, React breaks on useContext).
+
+# ── Prompt ────────────────────────────────────────────────────────────────────
+# starship/.starship.toml on every machine, overriding Omarchy's
+# ~/.config/starship.toml. Read on each prompt, so setting it after init is fine.
+export STARSHIP_CONFIG="$HOME/.starship.toml"
 
 # ── Editor ────────────────────────────────────────────────────────────────────
 # Cursor where installed; otherwise keep Omarchy's EDITOR (nvim).
