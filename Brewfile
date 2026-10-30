@@ -16,7 +16,6 @@ tap "protonpass/tap"
 brew "protonpass/tap/pass-cli"
 
 # Shell
-brew "antidote"
 brew "starship"
 brew "tmux"
 

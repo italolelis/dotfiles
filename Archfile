@@ -16,7 +16,6 @@
 # repeated here. Node, gh, claude, codex and pi come from mise (mise/.config/mise/config.toml).
 
 # ── CLI tools ──────────────────────────────────────────────────────────────────
-pacman zsh
 pacman stow           # required for dotfiles management
 pacman jq
 pacman tree
@@ -55,6 +54,14 @@ aur    hyprmoncfg-bin                          # monitor layouts + auto-switchin
 omarchy ghostty    install-terminal ghostty    # also makes it the default terminal
 omarchy steam      install-gaming-steam        # installs the right lib32 GPU drivers first
 omarchy voxtype-bin voxtype-install            # dictation: downloads the model, sets up the service
+
+# ── Elgato Wave XLR ────────────────────────────────────────────────────────────
+# OpenXLR: USB controls for the interface, its mic capture-hold fix and an Omarchy bar
+# mixer; install.sh enables the daemon and links the plugin. Built on Omarchy, its
+# PKGBUILD adds qt6-websockets, which its .SRCINFO lacks, so yay never installs it and
+# the build aborts. pacman entries install before aur ones, so listing it here works.
+pacman qt6-websockets
+aur    openxlr
 
 # ── Not bundled ────────────────────────────────────────────────────────────────
 # Installer and hardware packages: the Omarchy ISO picks these per machine.

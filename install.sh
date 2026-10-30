@@ -3,12 +3,11 @@ set -euo pipefail
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 # Use a fixed constant — do NOT derive from BASH_SOURCE (see RESEARCH.md Pitfall 7)
-DOTFILES="$HOME/.dotfiles"
+export DOTFILES="$HOME/.dotfiles"  # exported for dot-packages
 BACKUP_DIR="$HOME/.backup/dotfiles_$(date +%Y%m%d_%H%M%S)"
-PACKAGES=(zsh git tmux starship cship cmux k9s pi mise ssh misc bin)
-# Linux only: Ghostty is the Omarchy terminal. On macOS cmux is Ghostty-backed, and
-# this config imports an Omarchy theme path that does not exist there.
-LINUX_PACKAGES=(ghostty)
+# Which packages to stow is decided by dot-packages (every top-level dir, minus a
+# skip list); how to stow them by .stowrc. Run from the repo: bin/ is not stowed yet.
+DOT_PACKAGES="$DOTFILES/bin/.local/bin/dot-packages"
 # Single source of truth for pi's extension list, theme, and default model.
 # Read straight from the repo so it works before the pi package is stowed.
 PI_SETTINGS="$DOTFILES/pi/.pi/agent/settings.json"
@@ -89,36 +88,13 @@ install_mise_tools() {
   command -v mise &>/dev/null || return 0
   info "Installing mise tools..."
   mise install || log "[warn] some mise tools failed — review output above"
-  # This script never sources zsh's mise activation; the shims make node, npm
+  # This script never sources the shell's mise activation; the shims make node, npm
   # and pi visible to install_pi below.
   export PATH="$HOME/.local/share/mise/shims:$PATH"
   ok "mise tools"
 }
 
 # ── Linux Setup ───────────────────────────────────────────────────────────────
-linux_require_zsh() {
-  info "Checking zsh (Linux)..."
-  if command -v zsh &>/dev/null; then
-    ok "zsh already installed: $(zsh --version)"
-    return 0
-  fi
-  if command -v apt-get &>/dev/null; then
-    log "Installing zsh via apt-get..."
-    if [[ "$(id -u)" -eq 0 ]]; then
-      apt-get update -qq && apt-get install -y zsh
-    elif command -v sudo &>/dev/null; then
-      sudo apt-get update -qq && sudo apt-get install -y zsh
-    else
-      log "No sudo access and zsh not found — stowing git config only"
-      stow_package git
-      exit 0
-    fi
-    ok "zsh installed"
-  else
-    fail "Cannot install zsh — apt-get not available and zsh not found"
-  fi
-}
-
 linux_require_stow() {
   info "Checking GNU Stow (Linux)..."
   if command -v stow &>/dev/null; then
@@ -138,19 +114,6 @@ linux_require_stow() {
   else
     fail "GNU Stow not found and apt-get unavailable. Install manually."
   fi
-}
-
-linux_install_antidote() {
-  info "Checking antidote (Linux)..."
-  if [[ -d "$HOME/.antidote" ]]; then
-    ok "antidote already at ~/.antidote"
-    return 0
-  fi
-  if ! command -v git &>/dev/null; then
-    fail "git is required to install antidote"
-  fi
-  git clone --depth=1 https://github.com/mattmc3/antidote.git "$HOME/.antidote"
-  ok "antidote installed at ~/.antidote"
 }
 
 linux_install_starship() {
@@ -194,9 +157,9 @@ install_pi() {
     ok "pi already installed: $(pi --version 2>/dev/null | head -1)"
   else
     log "Installing pi via npm..."
-    # zsh/.exports sets npm_config_prefix, but this script runs under bash and
+    # bash/.bashrc sets npm_config_prefix, but this script is non-interactive and
     # never sources it - without this, npm would install into Homebrew's prefix
-    # while ~/.npm-global/bin sits first on the zsh PATH, so a later `npm i -g`
+    # while ~/.npm-global/bin sits first on the shell PATH, so a later `npm i -g`
     # from an interactive shell would silently shadow this install.
     npm_config_prefix="$HOME/.npm-global" \
       npm install -g --ignore-scripts @earendil-works/pi-coding-agent
@@ -306,19 +269,17 @@ stow_package() {
   # Back up any conflicting regular files before stowing
   backup_conflicts "$pkg"
 
-  stow --restow --no-folding \
-    --target="$HOME" \
-    --dir="$DOTFILES" \
-    "$pkg"
+  # Flags (--target=~, --no-folding) come from .stowrc, which stow only reads
+  # from the current directory, hence the cd.
+  (cd "$DOTFILES" && stow --restow "$pkg")
   ok "$pkg"
 }
 
 stow_packages() {
-  local pkgs=("${PACKAGES[@]}")
-  if $IS_LINUX; then pkgs+=("${LINUX_PACKAGES[@]}"); fi
-  for pkg in "${pkgs[@]}"; do
+  local pkg
+  while IFS= read -r pkg; do
     stow_package "$pkg"
-  done
+  done < <("$DOT_PACKAGES")
 }
 
 # ── Git credential helper ──────────────────────────────────────────────────────
@@ -347,17 +308,21 @@ configure_git_credentials() {
 
 # ── Login shell ────────────────────────────────────────────────────────────────
 check_login_shell() {
-  local zsh_path
-  zsh_path="$(command -v zsh || true)"
-  if [[ -n "$zsh_path" ]] && [[ "$(getent passwd "$USER" 2>/dev/null | cut -d: -f7)" != "$zsh_path" ]]; then
-    log "[warn] login shell is not zsh — run: chsh -s $zsh_path"
+  local current
+  if $IS_MACOS; then
+    current="$(dscl . -read "/Users/$USER" UserShell 2>/dev/null | awk '{print $2}')"
+  else
+    current="$(getent passwd "$USER" 2>/dev/null | cut -d: -f7)"
+  fi
+  if [[ "${current##*/}" != bash ]]; then
+    log "[warn] login shell is ${current:-unknown}, not bash — run: chsh -s /bin/bash"
   fi
 }
 
 # ── Proton Pass SSH agent ──────────────────────────────────────────────────────
 # SSH keys live in the Proton Pass vault "SSH Keys". pass-cli serves them on
 # ~/.ssh/proton-pass-agent.sock, which ssh/.ssh/config (IdentityAgent) and
-# zsh/.exports (SSH_AUTH_SOCK) point at. It needs `pass-cli login` once.
+# bash/.bashrc (SSH_AUTH_SOCK) point at. It needs `pass-cli login` once.
 install_proton_ssh_agent() {
   info "Checking Proton Pass SSH agent..."
   local pass_cli
@@ -410,9 +375,11 @@ EOF
       ok "SSH agent starts at login ($label)"
     fi
   elif $IS_LINUX && command -v systemctl &>/dev/null; then
-    # pass-cli 2.4.2 fails the first `pass-cli login` ("Error opening temp
-    # session file") when its data dir does not exist yet.
-    mkdir -p "$HOME/.local/share/proton-pass-cli" && chmod 700 "$HOME/.local/share/proton-pass-cli"
+    # `pass-cli login` fails after the browser step ("Error opening temp session
+    # file") when its session dir is missing: 2.4.2 needed the data dir, 2.5.1
+    # needs .session inside it too (seen 2026-10-30, after a re-login).
+    local pass_data="$HOME/.local/share/proton-pass-cli"
+    mkdir -p "$pass_data/.session" && chmod 700 "$pass_data" "$pass_data/.session"
     local unit="proton-pass-ssh-agent.service"
     if systemctl --user is-enabled "$unit" &>/dev/null; then
       ok "SSH agent already enabled ($unit)"
@@ -439,6 +406,29 @@ EOF
   fi
 }
 
+# ── OpenXLR (Elgato Wave XLR) ──────────────────────────────────────────────────
+# The Archfile installs openxlr, but a package cannot touch $HOME: enable its user
+# daemon here and link its Omarchy bar plugin. The link needs a running Omarchy shell.
+setup_openxlr() {
+  info "Checking OpenXLR..."
+  if ! command -v openxlr-daemon &>/dev/null; then
+    log "openxlr not installed — skipping (the Archfile installs it)"
+    return 0
+  fi
+  if systemctl --user is-enabled openxlr-daemon.service &>/dev/null; then
+    ok "daemon already enabled"
+  else
+    systemctl --user enable --now openxlr-daemon.service
+    ok "daemon starts at login"
+  fi
+  if [[ -e "$HOME/.config/omarchy/plugins/openxlr.mixer" ]]; then
+    ok "bar plugin already linked"
+  elif command -v openxlr-omarchy-enable &>/dev/null; then
+    openxlr-omarchy-enable \
+      || log "[warn] openxlr-omarchy-enable failed — run it inside the Omarchy session"
+  fi
+}
+
 # ── Main ───────────────────────────────────────────────────────────────────────
 main() {
   echo ""
@@ -459,13 +449,11 @@ main() {
     run_brew_bundle
     install_cship
   elif $IS_LINUX; then
-    # On Arch this installs zsh and stow, so the apt-based checks below no-op.
+    # On Arch this installs stow, so the apt-based check below no-ops.
     if command -v pacman &>/dev/null; then
       arch_install_packages
     fi
-    linux_require_zsh
     linux_require_stow
-    linux_install_antidote
     linux_install_starship
     linux_install_fzf
     install_cship
@@ -476,6 +464,7 @@ main() {
   stow_packages
   configure_git_credentials
   install_proton_ssh_agent
+  if $IS_LINUX; then setup_openxlr; fi
   check_login_shell
   install_mise_tools
 
@@ -488,7 +477,7 @@ main() {
   echo "=============================="
   echo "  Done! ($PLATFORM)"
   echo "  Restart your shell or run:"
-  echo "    source ~/.zshrc"
+  echo "    source ~/.bashrc"
   echo "=============================="
 }
 

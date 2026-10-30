@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# dot-packages — print the stow packages for this platform, one per line.
+#
+# Every top-level directory of the repo is a package, unless listed below.
+# Adding a package is creating its directory; there is no list to keep in sync.
+# Used by install.sh and dot.
+set -euo pipefail
+
+DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
+
+# Top-level directories that are not stow packages.
+NOT_PACKAGES=(assets)
+# Omarchy only. ghostty imports an Omarchy theme path that does not exist on macOS
+# (where cmux is the Ghostty-backed terminal); hypr and wave-xlr are Hyprland
+# bindings and Elgato Wave XLR glue.
+LINUX_ONLY=(ghostty hypr wave-xlr)
+
+is_listed() {
+  local needle="$1"; shift
+  local item
+  for item in "$@"; do [[ "$item" == "$needle" ]] && return 0; done
+  return 1
+}
+
+is_linux=false
+[[ "$(uname -s)" == Linux ]] && is_linux=true
+
+# Hidden directories (.git, .vscode) are skipped by the glob.
+for dir in "$DOTFILES"/*/; do
+  pkg="$(basename "$dir")"
+  is_listed "$pkg" "${NOT_PACKAGES[@]}" && continue
+  if ! $is_linux && is_listed "$pkg" "${LINUX_ONLY[@]}"; then continue; fi
+  echo "$pkg"
+done

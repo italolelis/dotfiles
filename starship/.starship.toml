@@ -1,146 +1,59 @@
-# Starship prompt configuration
-# Get editor completions based on the config schema
+# Starship prompt — Omarchy's minimal look, plus the context worth having:
+# kubernetes context, slow-command duration, and the hostname over ssh.
+#
+#   .dotfiles feat/omarchy ✘ ! ? ⎈ homelab took 5s
+#   ❯
+#
+# Used on every machine via STARSHIP_CONFIG (bash/.bashrc), so it replaces
+# Omarchy's ~/.config/starship.toml.
 "$schema" = 'https://starship.rs/config-schema.json'
 
-# Inserts a blank line between shell prompts
 add_newline = true
+command_timeout = 200
+format = "$hostname$directory$git_branch$git_status$kubernetes$cmd_duration$line_break$character"
 
-# Replace the '❯' symbol in the prompt with '➜'
 [character]
-success_symbol = '[➜](bold green)'
-error_symbol = '[✗](bold red)'
+success_symbol = "[❯](bold cyan)"
+error_symbol = "[✗](bold red)"
 
-# Disable the package module, hiding it from the prompt completely
-[package]
-disabled = true
-
-# Customize the git status module
-[git_status]
-conflicted = "⚡"
-ahead = "⇡${count}"
-behind = "⇣${count}"
-diverged = "⇕⇡${ahead_count}⇣${behind_count}"
-up_to_date = "✓"
-untracked = "?"
-stashed = "≡"
-modified = "!"
-staged = "+"
-renamed = "»"
-deleted = "✘"
-
-# Customize the git_branch module
-[git_branch]
-symbol = " "
-truncation_length = 4
-truncation_symbol = ""
-style = "bold purple"
-
-# Customize the directory module
 [directory]
-truncation_length = 3
+truncation_length = 2
 truncation_symbol = "…/"
-style = "bold blue"
+repo_root_style = "bold cyan"
+repo_root_format = "[$repo_root]($repo_root_style)[$path]($style)[$read_only]($read_only_style) "
 
-# Customize the command module
+# Full branch name: truncating turned feat/omarchy into "feat".
+[git_branch]
+format = "[$branch]($style) "
+style = "italic cyan"
+
+# Plain ASCII markers, readable without a Nerd Font.
+[git_status]
+format = '[$all_status$ahead_behind]($style)'
+style = "cyan"
+ahead = "⇡${count} "
+behind = "⇣${count} "
+diverged = "⇕⇡${ahead_count}⇣${behind_count} "
+conflicted = "= "
+untracked = "? "
+modified = "! "
+staged = "+ "
+deleted = "✘ "
+renamed = "» "
+stashed = "≡ "
+
+# Only when it tells you something: you are on another machine.
+[hostname]
+ssh_only = true
+format = "[$hostname](bold yellow) "
+
+# Disabled by default in starship; on so the homelab context is always visible.
+[kubernetes]
+disabled = false
+format = '[⎈ $context]($style) '
+style = "blue"
+
 [cmd_duration]
 min_time = 2000
-style = "bold yellow"
-
-# Customize the nodejs module
-[nodejs]
-symbol = " "
-style = "bold green"
-
-# Customize the python module
-[python]
-symbol = " "
-style = "bold yellow"
-
-# Customize the docker_context module
-[docker_context]
-symbol = " "
-style = "bold blue"
-
-# Customize the kubernetes module
-[kubernetes]
-symbol = " "
-style = "bold green"
-
-# Customize the aws module
-[aws]
-symbol = " "
-style = "bold yellow"
-
-# Customize the gcloud module
-[gcloud]
-symbol = " "
-style = "bold blue"
-
-# Customize the time module
-[time]
-disabled = false
-format = '🕙[\[ $time \]]($style) '
-time_format = "%T"
-style = "bold white"
-
-# Customize the memory_usage module
-[memory_usage]
-disabled = false
-threshold = 75
-symbol = " "
-style = "bold red"
-
-# Customize the battery module
-[battery]
-full_symbol = "🔋"
-charging_symbol = "⚡"
-discharging_symbol = "💀"
-unknown_symbol = "❓"
-empty_symbol = "🪫"
-format = "[$symbol$percentage]($style) "
-disabled = false
-
-# Customize the hostname module
-[hostname]
-ssh_only = false
-format = "[$hostname](bold red) "
-disabled = false
-
-# Customize the username module
-[username]
-style_user = "bold yellow"
-style_root = "bold red"
-format = "[$user]($style) "
-disabled = false
-show_always = false
-
-# Customize the jobs module
-[jobs]
-symbol = " "
-style = "bold blue"
-format = "[$symbol$number]($style) "
-disabled = false
-
-# Customize the status module
-[status]
-symbol = "✗"
-style = "bold red"
-format = '[\[ $symbol $common_meaning$signal_name$maybe_int\]]($style) '
-disabled = false
-
-# Customize the line_break module
-[line_break]
-disabled = false
-
-# Customize the localip module
-[localip]
-ssh_only = false
-format = '@[$localipv4](bold red) '
-disabled = false
-
-# Customize the shlvl module
-[shlvl]
-symbol = " "
-style = "bold yellow"
-format = '[$symbol$shlvl]($style) '
-disabled = false
+format = "[took $duration]($style) "
+style = "yellow"
