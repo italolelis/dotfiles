@@ -16,7 +16,7 @@ to the `PACKAGES` arrays. Never create a file directly in `$HOME` and never writ
 path that is already a symlink into this repo — edit the file here instead.
 
 Stowed packages: `zsh git tmux starship cship cmux k9s pi mise ssh misc bin`, plus
-`ghostty` on Linux only (`LINUX_PACKAGES`).
+`ghostty hypr wave-xlr` on Linux only (`LINUX_PACKAGES`).
 
 Not stowed: `Brewfile`, `Archfile`, `install.sh`, `macos.sh`, `assets/` (README logo).
 
@@ -50,6 +50,9 @@ starship/   .starship.toml
 cship/      cship config (Claude Code statusline)
 cmux/       .config/cmux/cmux.json — the macOS terminal
 ghostty/    .config/ghostty/config — the Omarchy terminal (Linux only)
+hypr/       .config/hypr/bindings.lua — Hyprland keybinding overrides (Linux only)
+wave-xlr/   Elgato Wave XLR glue: `wave-xlr-volume` (volume keys → device headphone level)
+            and the WirePlumber soft-mixer rule (Linux only; OpenXLR comes from the Archfile)
 k9s/        .config/k9s/ — config, skin, aliases, hotkeys, views, flux/stern plugins
 ssh/        ~/.ssh/config only — never keys
 misc/       .curlrc, .editorconfig, .inputrc, .wgetrc
@@ -99,6 +102,18 @@ It started as Omarchy's stock config (`/usr/share/omarchy/config/ghostty/config`
 diff against that to see what's actually customized. `omarchy refresh config
 ghostty/config` copies the stock file through the symlink, overwriting the tracked one;
 check `git diff` after it. Validate edits with `ghostty +validate-config`.
+
+**Only `bindings.lua` from `~/.config/hypr` is tracked.** The rest (`monitors.lua`,
+`hyprland.lua`, ...) is per machine. After editing it, run `hyprctl reload` then
+`hyprctl configerrors`; Omarchy's defaults bind the volume keys first, so the
+`hl.unbind` lines in it must stay before the `o.bind` lines that replace them.
+
+**Wave XLR: the hardware mixer is half broken.** Reading its `Mic` control fails
+(`broken mixer GET_CUR` in `dmesg`), so the WirePlumber rule keeps PipeWire on a soft
+mixer, and `wave-xlr-volume` writes only the `PCM` control (the headphone level). The
+mic-goes-silent bug is fixed by OpenXLR's packaged `52-openxlr-mk1-capture-hold.conf`,
+not by anything here. The rule matches any Wave XLR by name pattern on purpose: a
+unit's serial number does not belong in this public repo.
 
 **`DOTFILES` is a fixed constant (`$HOME/.dotfiles`), deliberately not derived from
 `BASH_SOURCE`.** Leave it that way; deriving it broke curl-piped installs.

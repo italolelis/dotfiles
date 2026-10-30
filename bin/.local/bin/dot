@@ -6,7 +6,7 @@ set -euo pipefail
 DOTFILES="$HOME/.dotfiles"
 # Keep in sync with PACKAGES in ~/.dotfiles/install.sh
 PACKAGES=(zsh git tmux starship cship cmux k9s pi mise ssh misc bin)
-LINUX_PACKAGES=(ghostty)  # Keep in sync with LINUX_PACKAGES in install.sh
+LINUX_PACKAGES=(ghostty hypr wave-xlr)  # Keep in sync with LINUX_PACKAGES in install.sh
 
 PLATFORM="$(/usr/bin/uname -s)"
 IS_MACOS=false

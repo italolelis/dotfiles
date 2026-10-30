@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# Volume keys for the Elgato Wave XLR. PipeWire runs it on a soft mixer (see
+# ~/.config/wireplumber/wireplumber.conf.d/elgato-wave-xlr-soft-mixer.conf), so the
+# stock keys never reach the device's own headphone level or its LED ring. When the
+# Wave XLR is the output, drive its hardware "PCM" control directly and pin PipeWire
+# at 100%; any other output falls through to omarchy-audio-output-volume.
+# Only PCM (unit 5) is touched: the broken GET_CUR is on the Mic control (unit 6).
+set -euo pipefail
+
+action="${1:-}"
+
+sink="$(omarchy-audio-output-sink)"
+if [[ $sink != *Elgato_Wave_XLR* ]]; then
+  exec omarchy-audio-output-volume "$@"
+fi
+
+# PCM spans -60..0 dB in 120 raw steps, so 5% is a 3 dB step at any level.
+mixer() { amixer -q -c XLR "$@"; }
+
+case "$action" in
+  raise) mixer sset PCM 5%+ unmute ;;
+  lower) mixer sset PCM 5%- unmute ;;
+  mute-toggle)
+    # Same 250ms debounce as omarchy-audio-output-volume, sharing its stamp file.
+    debounce_file="${XDG_RUNTIME_DIR:-/tmp}/omarchy-audio-output-volume-mute-toggle.last"
+    now=$(date +%s%3N)
+    last=0
+    [[ -r $debounce_file ]] && read -r last <"$debounce_file" || true
+    ((now - last < 250)) && exit 0
+    printf '%s\n' "$now" >"$debounce_file"
+    mixer sset PCM toggle
+    ;;
+  +[0-9]*) mixer sset PCM "${action#+}%+" unmute ;;
+  -[0-9]*) mixer sset PCM "${action#-}%-" unmute ;;
+  *)
+    echo "Usage: wave-xlr-volume <raise|lower|mute-toggle|+N|-N>"
+    exit 1
+    ;;
+esac
+
+pactl set-sink-mute "$sink" 0
+pactl set-sink-volume "$sink" 100%
+
+state=$(amixer -c XLR sget PCM | tail -1)
+percent=$(grep -o '[0-9]*%' <<<"$state" | head -1 | tr -d %)
+if [[ $state == *"[off]"* ]] || ((${percent:-0} == 0)); then
+  icon="volume-muted"
+else
+  icon="volume-high"
+fi
+
+omarchy-osd -i "$icon" -p "${percent:-0}"

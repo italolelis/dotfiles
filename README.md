@@ -151,6 +151,8 @@ starship/   .starship.toml
 cship/      Claude Code status line
 cmux/       cmux terminal config (macOS)
 ghostty/    Ghostty terminal config (Omarchy only; follows the Omarchy theme)
+hypr/       Hyprland keybinding overrides (Omarchy only)
+wave-xlr/   Elgato Wave XLR volume keys + WirePlumber rule (Omarchy only)
 k9s/        k9s config for the homelab cluster: skin, hotkeys, flux/stern plugins
 pi/         pi agent settings (theme, model, extensions) + custom extensions
 mise/       global mise tools: node, gh, claude, codex, pi

@@ -7,8 +7,9 @@ DOTFILES="$HOME/.dotfiles"
 BACKUP_DIR="$HOME/.backup/dotfiles_$(date +%Y%m%d_%H%M%S)"
 PACKAGES=(zsh git tmux starship cship cmux k9s pi mise ssh misc bin)
 # Linux only: Ghostty is the Omarchy terminal. On macOS cmux is Ghostty-backed, and
-# this config imports an Omarchy theme path that does not exist there.
-LINUX_PACKAGES=(ghostty)
+# this config imports an Omarchy theme path that does not exist there. hypr and
+# wave-xlr are Hyprland bindings and Elgato Wave XLR glue, both Omarchy-only.
+LINUX_PACKAGES=(ghostty hypr wave-xlr)
 # Single source of truth for pi's extension list, theme, and default model.
 # Read straight from the repo so it works before the pi package is stowed.
 PI_SETTINGS="$DOTFILES/pi/.pi/agent/settings.json"
@@ -439,6 +440,29 @@ EOF
   fi
 }
 
+# ── OpenXLR (Elgato Wave XLR) ──────────────────────────────────────────────────
+# The Archfile installs openxlr, but a package cannot touch $HOME: enable its user
+# daemon here and link its Omarchy bar plugin. The link needs a running Omarchy shell.
+setup_openxlr() {
+  info "Checking OpenXLR..."
+  if ! command -v openxlr-daemon &>/dev/null; then
+    log "openxlr not installed — skipping (the Archfile installs it)"
+    return 0
+  fi
+  if systemctl --user is-enabled openxlr-daemon.service &>/dev/null; then
+    ok "daemon already enabled"
+  else
+    systemctl --user enable --now openxlr-daemon.service
+    ok "daemon starts at login"
+  fi
+  if [[ -e "$HOME/.config/omarchy/plugins/openxlr.mixer" ]]; then
+    ok "bar plugin already linked"
+  elif command -v openxlr-omarchy-enable &>/dev/null; then
+    openxlr-omarchy-enable \
+      || log "[warn] openxlr-omarchy-enable failed — run it inside the Omarchy session"
+  fi
+}
+
 # ── Main ───────────────────────────────────────────────────────────────────────
 main() {
   echo ""
@@ -476,6 +500,7 @@ main() {
   stow_packages
   configure_git_credentials
   install_proton_ssh_agent
+  if $IS_LINUX; then setup_openxlr; fi
   check_login_shell
   install_mise_tools
 
