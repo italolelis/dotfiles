@@ -75,6 +75,13 @@ macos.sh    macOS system defaults — run manually, needs a reboot
 that is *not* a package (like `assets/`) must go in `NOT_PACKAGES`, or `dot` will
 symlink its contents into `$HOME`. Hidden directories (`.git`, `.vscode`) are skipped.
 
+**Omarchy's tools break symlinks.** `omarchy-display-text-size` edits
+`~/.config/ghostty/config` with `sed -i`, which writes a new regular file over the
+symlink. The repo copy goes stale and the next `dot` stops on a stow conflict. To keep
+the live version: `stow --adopt --restow ghostty` from the repo root (moves the file
+into the repo, relinks), then review `git diff`. Any Omarchy command that rewrites a
+stowed file has the same effect.
+
 **A stow package with no files under a `$HOME`-shaped path stows nothing.** `cmux/`
 once held only a stow-ignored reference file, so the package was inert while the real
 config sat untracked in `~/.config/cmux/`. If a package seems to do nothing, run
