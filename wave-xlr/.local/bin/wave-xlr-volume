@@ -25,7 +25,7 @@ case "$action" in
     debounce_file="${XDG_RUNTIME_DIR:-/tmp}/omarchy-audio-output-volume-mute-toggle.last"
     now=$(date +%s%3N)
     last=0
-    [[ -r $debounce_file ]] && read -r last <"$debounce_file" || true
+    if [[ -r $debounce_file ]]; then read -r last <"$debounce_file" || true; fi
     ((now - last < 250)) && exit 0
     printf '%s\n' "$now" >"$debounce_file"
     mixer sset PCM toggle
