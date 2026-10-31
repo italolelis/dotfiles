@@ -22,8 +22,10 @@ info "Pulling dotfiles..."
 git -C "$DOTFILES" pull --ff-only
 ok "git pull"
 
-# 2. Restow all packages (prunes stale symlinks, creates new ones)
+# 2. Restow all packages (prunes stale symlinks, creates new ones). Dry-run them all
+#    first, so every conflict is listed with its fix instead of stopping at the first.
 info "Restowing packages..."
+"$DOTFILES/bin/.local/bin/dot-check" stow
 # Package list from dot-packages, stow flags from .stowrc (read from the cwd).
 cd "$DOTFILES"
 while IFS= read -r pkg; do

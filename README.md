@@ -50,6 +50,7 @@ Then open a new terminal. Then work through the [one-time setup](#one-time-setup
 | See what's missing on this machine (macOS) | `brew bundle check --file=~/.dotfiles/Brewfile --verbose` |
 | Upgrade the whole system (Omarchy) | `omarchy-update` |
 | Re-run the full installer | `~/.dotfiles/install.sh --force` |
+| Check the repo before committing (also the pre-commit hook and CI) | `dot-check` |
 
 `dot` runs `git pull`, re-links every package, then installs what's new: brew upgrades on macOS, and `arch-bundle` plus `mise install` on Omarchy.
 
@@ -140,7 +141,7 @@ To add a new config, for example `~/.config/foo/config.toml`:
 1. Create `foo/.config/foo/config.toml` here.
 2. Run `dot`.
 
-Every top-level folder is a package; `dot-packages` prints the list for this machine. Folders that aren't packages (`assets/`) or are Omarchy-only (`hypr/`) are listed in `bin/.local/bin/dot-packages`. Stow's flags live in [`.stowrc`](./.stowrc), so from the repo root a dry run is just `stow -nv foo`.
+Every top-level folder is a package; `dot-packages` prints the list for this machine, and a package's own `README.md` (never linked into `$HOME`) holds its gotchas. Folders that aren't packages (`assets/`) or are Omarchy-only (`hypr/`) are listed in `bin/.local/bin/dot-packages`. Stow's flags live in [`.stowrc`](./.stowrc), so from the repo root a dry run is just `stow -nv foo`.
 
 ### Layout
 
@@ -150,8 +151,8 @@ git/        .gitconfig, .gitignore_global
 tmux/       .tmux.conf
 starship/   .starship.toml
 cship/      Claude Code status line
-cmux/       cmux terminal config (macOS)
-ghostty/    Ghostty terminal config (Omarchy only; follows the Omarchy theme)
+ghostty/    Ghostty terminal config (both OSes; follows the Omarchy theme there)
+herdr/      herdr multiplexer config: tmux-style keys and UI
 hypr/       Hyprland keybinding overrides (Omarchy only)
 wave-xlr/   Elgato Wave XLR volume keys + WirePlumber rule (Omarchy only)
 k9s/        k9s config for the homelab cluster: skin, hotkeys, flux/stern plugins
@@ -159,7 +160,7 @@ pi/         pi agent settings (theme, model, extensions) + custom extensions
 mise/       global mise tools: node, gh, claude, codex, pi
 ssh/        ~/.ssh/config only (no keys, no real hosts)
 misc/       .curlrc, .editorconfig, .inputrc, .wgetrc
-bin/        dot, dot-packages, arch-bundle
+bin/        dot, dot-packages, dot-check, arch-bundle
 assets/     the logo up top
 
 Brewfile    macOS packages          ┐

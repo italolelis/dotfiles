@@ -1,0 +1,4 @@
+# pi rewrites its settings with machine state: a per-machine deviceId (must not reach
+# this public repo) and lastChangelogVersion (churns on every pi upgrade). The
+# pi-settings clean filter strips both on the way into git; install.sh defines it.
+pi/.pi/agent/settings.json filter=pi-settings

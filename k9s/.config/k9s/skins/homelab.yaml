@@ -1,7 +1,7 @@
 # k9s skin: homelab
 #
 # `default` means "whatever the terminal already uses", so backgrounds stay
-# transparent and this follows the cmux theme instead of painting over it —
+# transparent and this follows the Ghostty theme instead of painting over it —
 # the same skin is readable on a light and a dark profile.
 #
 # Colours are a Catppuccin-ish accent set chosen so the three states you scan

@@ -306,6 +306,18 @@ configure_git_credentials() {
   fi
 }
 
+# ── This repo's own git config ─────────────────────────────────────────────────
+# Repo-local, so it can't live in the tracked git/.gitconfig: the pre-commit hook
+# (bin/.local/bin/dot-check) and the clean filter .gitattributes names for pi's
+# settings, which strips the per-machine deviceId and lastChangelogVersion.
+configure_repo_git() {
+  info "Configuring the dotfiles repo's git hooks and filters..."
+  git -C "$DOTFILES" config core.hooksPath .githooks
+  git -C "$DOTFILES" config filter.pi-settings.clean "jq 'del(.deviceId, .lastChangelogVersion)'"
+  git -C "$DOTFILES" config filter.pi-settings.smudge cat
+  ok "pre-commit hook and pi-settings filter"
+}
+
 # ── Login shell ────────────────────────────────────────────────────────────────
 check_login_shell() {
   local current
@@ -463,6 +475,7 @@ main() {
   mkdir -p "$HOME/.ssh" && chmod 700 "$HOME/.ssh"
   stow_packages
   configure_git_credentials
+  configure_repo_git
   install_proton_ssh_agent
   if $IS_LINUX; then setup_openxlr; fi
   check_login_shell
