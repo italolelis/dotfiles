@@ -15,9 +15,12 @@ brew "wget"
 tap "protonpass/tap"
 brew "protonpass/tap/pass-cli"
 
-# Shell
+# Shell and terminal: Ghostty + herdr on both OSes (herdr's config is the `herdr`
+# package, Ghostty's the `ghostty` package)
+brew "herdr"
 brew "starship"
 brew "tmux"
+cask "ghostty"
 
 # Development
 brew "bun"
@@ -44,7 +47,6 @@ brew "uv"
 # Apps
 cask "arc"
 cask "discord"
-cask "cmux"
 cask "gpg-suite"
 cask "insomnia"
 cask "mac-mouse-fix"
@@ -57,3 +59,4 @@ cask "tableplus"
 # Fonts
 cask "font-fira-code"
 cask "font-jetbrains-mono"
+cask "font-jetbrains-mono-nerd-font"   # the Ghostty font; Omarchy ships it

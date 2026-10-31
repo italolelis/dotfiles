@@ -50,8 +50,8 @@ git/        .gitconfig, .gitignore_global
 tmux/       .tmux.conf
 starship/   .starship.toml
 cship/      cship config (Claude Code statusline)
-cmux/       .config/cmux/cmux.json — the macOS terminal
-ghostty/    .config/ghostty/config — the Omarchy terminal (Linux only)
+ghostty/    .config/ghostty/config — the terminal, on both OSes
+herdr/      .config/herdr/config.toml — herdr (terminal multiplexer): tmux-style keys, UI
 hypr/       .config/hypr/bindings.lua — Hyprland keybinding overrides (Linux only)
 wave-xlr/   Elgato Wave XLR glue: `wave-xlr-volume` (volume keys → device headphone level)
             and the WirePlumber soft-mixer rule (Linux only; OpenXLR comes from the Archfile)
@@ -82,15 +82,15 @@ the live version: `stow --adopt --restow ghostty` from the repo root (moves the 
 into the repo, relinks), then review `git diff`. Any Omarchy command that rewrites a
 stowed file has the same effect.
 
-**A stow package with no files under a `$HOME`-shaped path stows nothing.** `cmux/`
-once held only a stow-ignored reference file, so the package was inert while the real
-config sat untracked in `~/.config/cmux/`. If a package seems to do nothing, run
+**A stow package with no files under a `$HOME`-shaped path stows nothing.** A package
+(the since-removed `cmux/`) once held only a stow-ignored reference file, so it was
+inert while the real config sat untracked in `~/.config/`. If a package seems to do nothing, run
 `find <pkg> -type f` and confirm the paths actually mirror `$HOME`.
 
 **k9s on macOS ignores `~/.config/k9s` by default.** It reads
 `~/Library/Application Support/k9s` unless `K9S_CONFIG_DIR` is set, which `bash/.bashrc`
 does. Remove that export and the entire `k9s` package goes inert with no error — the
-same class of bug as the inert `cmux/` package below. Verify with `k9s info`, which
+same class of bug as the inert package above. Verify with `k9s info`, which
 prints the paths it will actually use.
 
 **k9s config schemas are not uniform.** `config.yaml` is nested under a `k9s:` root key;
@@ -102,16 +102,20 @@ a silently ignored file. Check that log after editing any of them.
 `ssh $NAME` with the Kubernetes node name, which works only because `ssh/.ssh/config`
 defines `oracle`, `tank` and `cypher` with exactly those names.
 
-**One terminal per OS: cmux on macOS, Ghostty on Omarchy.** Ghostty was replaced by
-cmux on macOS; don't reintroduce the Ghostty cask. (cmux is Ghostty-backed internally,
-so the name still appears in cmux's own docs — that's fine.) On Omarchy the Archfile
-installs Ghostty through `omarchy-install-terminal`, and the `ghostty` package is
-stowed on Linux only: its config imports Omarchy's live theme
-(`~/.local/state/omarchy/current/theme/ghostty.conf`), which doesn't exist on macOS.
-It started as Omarchy's stock config (`/usr/share/omarchy/config/ghostty/config`), so
+**One terminal everywhere: Ghostty + herdr.** cmux was dropped (2026-10-30); macOS
+gets the Ghostty cask and herdr from the Brewfile, Omarchy installs Ghostty through
+`omarchy-install-terminal` (Archfile) and ships herdr. The one `ghostty` config serves
+both: it imports Omarchy's live theme with `config-file = ?...` (the `?` makes it
+optional, so macOS falls back to the default theme), and its Linux-only keys
+(`gtk-*`, `async-backend`) are ignored on macOS. Keep any new option either
+cross-platform or harmless on the other OS. It started as Omarchy's stock config (`/usr/share/omarchy/config/ghostty/config`), so
 diff against that to see what's actually customized. `omarchy refresh config
 ghostty/config` copies the stock file through the symlink, overwriting the tracked one;
 check `git diff` after it. Validate edits with `ghostty +validate-config`.
+
+**Only `config.toml` from `~/.config/herdr` is tracked.** The same directory holds
+herdr's sockets, logs and `session.json` (open workspaces); `--no-folding` is what
+keeps them out of the repo. Apply edits with `prefix+q` (`reload_config`).
 
 **Only `bindings.lua` from `~/.config/hypr` is tracked.** The rest (`monitors.lua`,
 `hyprland.lua`, ...) is per machine. After editing it, run `hyprctl reload` then
@@ -189,7 +193,7 @@ When you remove something non-obvious, leave a dated comment explaining why (see
 
 Conventional Commits, as seen in `git log`: `feat:`, `fix:`, `chore:`, `docs:`,
 `refactor:`. A scope is used when the change belongs to a package or plan, e.g.
-`feat(cship): ...`, `feat(cmux): ...`.
+`feat(cship): ...`, `feat(k9s): ...`.
 
 Do not commit unless asked. This repo frequently carries unrelated uncommitted
 changes — some machine-generated (Rancher Desktop appends a PATH block to the shell rc).

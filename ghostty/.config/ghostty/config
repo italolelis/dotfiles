@@ -1,4 +1,8 @@
-# Dynamic theme colors
+# Shared by Omarchy and macOS. Linux-only keys (gtk-*, async-backend) are ignored
+# on macOS, so one file serves both.
+
+# Dynamic theme colors: Omarchy's live theme. The ? makes it optional, so macOS,
+# which has no such file, falls back to Ghostty's default theme.
 config-file = ?"~/.local/state/omarchy/current/theme/ghostty.conf"
 
 # Font

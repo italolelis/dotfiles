@@ -10,10 +10,8 @@ DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
 
 # Top-level directories that are not stow packages.
 NOT_PACKAGES=(assets)
-# Omarchy only. ghostty imports an Omarchy theme path that does not exist on macOS
-# (where cmux is the Ghostty-backed terminal); hypr and wave-xlr are Hyprland
-# bindings and Elgato Wave XLR glue.
-LINUX_ONLY=(ghostty hypr wave-xlr)
+# Omarchy only: Hyprland bindings and Elgato Wave XLR glue.
+LINUX_ONLY=(hypr wave-xlr)
 
 is_listed() {
   local needle="$1"; shift

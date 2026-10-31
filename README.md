@@ -150,8 +150,8 @@ git/        .gitconfig, .gitignore_global
 tmux/       .tmux.conf
 starship/   .starship.toml
 cship/      Claude Code status line
-cmux/       cmux terminal config (macOS)
-ghostty/    Ghostty terminal config (Omarchy only; follows the Omarchy theme)
+ghostty/    Ghostty terminal config (both OSes; follows the Omarchy theme there)
+herdr/      herdr multiplexer config: tmux-style keys and UI
 hypr/       Hyprland keybinding overrides (Omarchy only)
 wave-xlr/   Elgato Wave XLR volume keys + WirePlumber rule (Omarchy only)
 k9s/        k9s config for the homelab cluster: skin, hotkeys, flux/stern plugins

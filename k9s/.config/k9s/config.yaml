@@ -28,7 +28,7 @@ k9s:
 
   ui:
     # `default` background in the skin means the terminal's own background
-    # shows through, so k9s follows the cmux theme instead of fighting it.
+    # shows through, so k9s follows the Ghostty theme instead of fighting it.
     skin: homelab
     enableMouse: false
     headless: false
