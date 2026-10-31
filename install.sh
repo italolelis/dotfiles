@@ -306,6 +306,15 @@ configure_git_credentials() {
   fi
 }
 
+# ── This repo's own git config ─────────────────────────────────────────────────
+# Repo-local, so it can't live in the tracked git/.gitconfig: the pre-commit hook
+# that runs bin/.local/bin/dot-check.
+configure_repo_git() {
+  info "Configuring the dotfiles repo's git hook..."
+  git -C "$DOTFILES" config core.hooksPath .githooks
+  ok "pre-commit hook"
+}
+
 # ── Login shell ────────────────────────────────────────────────────────────────
 check_login_shell() {
   local current
@@ -463,6 +472,7 @@ main() {
   mkdir -p "$HOME/.ssh" && chmod 700 "$HOME/.ssh"
   stow_packages
   configure_git_credentials
+  configure_repo_git
   install_proton_ssh_agent
   if $IS_LINUX; then setup_openxlr; fi
   check_login_shell

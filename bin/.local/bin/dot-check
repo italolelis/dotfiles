@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+# dot-check — the repo's guardrail: everything a broken commit has slipped past before.
+#
+# Usage: dot-check [--ci] [check...]      checks: scripts rc stow secrets ghostty
+#   (no checks named = all of them)
+#   --ci   stow into a scratch dir instead of $HOME (CI has no stowed home)
+#
+# Run by .githooks/pre-commit, by `dot` (stow only, before restowing) and by CI.
+set -uo pipefail
+
+DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
+CI=false
+checks=()
+for arg in "$@"; do
+  case "$arg" in
+    --ci) CI=true ;;
+    scripts|rc|stow|secrets|ghostty) checks+=("$arg") ;;
+    *) echo "dot-check: unknown argument: $arg" >&2; exit 2 ;;
+  esac
+done
+[[ ${#checks[@]} -eq 0 ]] && checks=(scripts rc stow secrets ghostty)
+
+errors=0
+pass() { echo "ok    $1"; }
+fail() { echo "FAIL  $1"; errors=$((errors + 1)); }
+skip() { echo "skip  $1"; }
+
+# ── scripts: syntax + shellcheck on every bash script in the repo ─────────────
+check_scripts() {
+  # Tracked and new files whose shebang names bash, wherever they live.
+  local files=() rel f bad=0
+  while IFS= read -r rel; do
+    f="$DOTFILES/$rel"
+    [[ -f "$f" ]] && head -n1 "$f" | grep -qE '^#!.*\bbash\b' && files+=("$f")
+  done < <(git -C "$DOTFILES" ls-files --cached --others --exclude-standard)
+  for f in "${files[@]}"; do
+    bash -n "$f" 2>&1 || { fail "bash -n ${f#"$DOTFILES"/}"; bad=1; }
+  done
+  if command -v shellcheck &>/dev/null; then
+    shellcheck "${files[@]}" || { fail "shellcheck (output above)"; bad=1; }
+  else
+    skip "shellcheck not installed"
+  fi
+  [[ $bad -eq 0 ]] && pass "scripts (${#files[@]} files)"
+}
+
+# ── rc: an interactive bash must finish the rc with $? = 0 ────────────────────
+# A trailing `[[ -r f ]] && source f` leaves $? at 1 when f is missing, and
+# starship then opens every terminal on a red "failed" prompt.
+check_rc() {
+  local status
+  env -i HOME="$HOME" USER="${USER:-}" TERM=dumb PATH=/usr/bin:/bin \
+    bash --noprofile --rcfile "$DOTFILES/bash/.bashrc" -i -c 'exit $?' >/dev/null 2>&1
+  status=$?
+  if [[ $status -eq 0 ]]; then pass "rc: bash/.bashrc ends with \$? = 0"
+  else fail "rc: bash/.bashrc leaves \$? = $status (its last command failed)"; fi
+}
+
+# ── stow: every package links cleanly, and no README gets linked ──────────────
+check_stow() {
+  command -v stow &>/dev/null || { skip "stow not installed"; return; }
+  local target="$HOME" pkg out bad=0
+  if $CI; then target="$(mktemp -d)"; fi
+  while IFS= read -r pkg; do
+    out="$(cd "$DOTFILES" && stow -n -v --restow --target="$target" "$pkg" 2>&1)"
+    if grep -q "conflict" <<<"$out"; then
+      fail "stow $pkg: a real file sits where a link belongs (an app rewrote it?)"
+      grep -E '^\s+\*' <<<"$out" | sed 's/^/        /'
+      echo "        keep the live file: cd $DOTFILES && stow --adopt --restow $pkg; then git diff"
+      bad=1
+    fi
+    if grep -qE 'LINK: .*README' <<<"$out"; then
+      fail "stow $pkg: README would be linked into \$HOME (add README.* to $pkg/.stow-local-ignore)"
+      bad=1
+    fi
+  done < <("$DOTFILES/bin/.local/bin/dot-packages")
+  $CI && rm -rf "$target"
+  [[ $bad -eq 0 ]] && pass "stow (every package links cleanly)"
+}
+
+# ── secrets: machine-specific values pi writes must not reach the public repo ──
+check_secrets() {
+  local file="pi/.pi/agent/settings.json"
+  # The index is what the next commit records; in CI it equals the checkout.
+  if git -C "$DOTFILES" show ":$file" 2>/dev/null | grep -q '"deviceId"'; then
+    fail "secrets: $file staged with pi's deviceId (is the pi-settings git filter set? see install.sh)"
+  else
+    pass "secrets (no deviceId staged)"
+  fi
+}
+
+# ── ghostty: the tracked config parses ────────────────────────────────────────
+check_ghostty() {
+  command -v ghostty &>/dev/null || { skip "ghostty not installed"; return; }
+  if ghostty +validate-config --config-file="$DOTFILES/ghostty/.config/ghostty/config"; then
+    pass "ghostty config"
+  else
+    fail "ghostty config (errors above)"
+  fi
+}
+
+for c in "${checks[@]}"; do "check_$c"; done
+
+if [[ $errors -gt 0 ]]; then
+  echo "dot-check: $errors problem(s)"
+  exit 1
+fi

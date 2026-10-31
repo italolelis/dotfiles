@@ -1,0 +1,19 @@
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  dot-check:
+    runs-on: ubuntu-latest
+    env:
+      DOTFILES: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install stow and shellcheck
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq stow shellcheck
+      # ghostty is skipped (not installed); stow links into a scratch dir (--ci).
+      - name: dot-check
+        run: bin/.local/bin/dot-check --ci scripts rc stow secrets
