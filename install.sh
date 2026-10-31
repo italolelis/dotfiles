@@ -308,11 +308,14 @@ configure_git_credentials() {
 
 # ── This repo's own git config ─────────────────────────────────────────────────
 # Repo-local, so it can't live in the tracked git/.gitconfig: the pre-commit hook
-# that runs bin/.local/bin/dot-check.
+# (bin/.local/bin/dot-check) and the clean filter .gitattributes names for pi's
+# settings, which strips the per-machine deviceId and lastChangelogVersion.
 configure_repo_git() {
-  info "Configuring the dotfiles repo's git hook..."
+  info "Configuring the dotfiles repo's git hooks and filters..."
   git -C "$DOTFILES" config core.hooksPath .githooks
-  ok "pre-commit hook"
+  git -C "$DOTFILES" config filter.pi-settings.clean "jq 'del(.deviceId, .lastChangelogVersion)'"
+  git -C "$DOTFILES" config filter.pi-settings.smudge cat
+  ok "pre-commit hook and pi-settings filter"
 }
 
 # ── Login shell ────────────────────────────────────────────────────────────────

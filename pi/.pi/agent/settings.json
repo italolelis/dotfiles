@@ -6,7 +6,6 @@
     "npm:@juicesharp/rpiv-ask-user-question",
     "npm:pi-cc-extensions"
   ],
-  "lastChangelogVersion": "1.4.0",
   "theme": "cc-dark",
   "defaultProvider": "anthropic",
   "defaultModel": "claude-opus-5-5",
