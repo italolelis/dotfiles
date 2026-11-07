@@ -8,8 +8,9 @@ set -euo pipefail
 
 DOTFILES="${DOTFILES:-$HOME/.dotfiles}"
 
-# Top-level directories that are not stow packages.
-NOT_PACKAGES=(assets)
+# Top-level directories that are not stow packages. omarchy/ is copied by
+# dot-omarchy, not linked: Omarchy replaces links to shell.json with plain files.
+NOT_PACKAGES=(assets omarchy)
 # Omarchy only: Hyprland bindings and Elgato Wave XLR glue.
 LINUX_ONLY=(hypr wave-xlr)
 

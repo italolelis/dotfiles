@@ -38,6 +38,9 @@ rather than writing a rule here.
 - **Apps rewrite stowed files behind the link** (Omarchy's `sed -i`, `omarchy refresh
   config`). `dot-check stow` lists them; `stow --adopt --restow <pkg>` keeps the live
   file, then review `git diff`.
+- **`omarchy/` is copied, never stowed**: Omarchy replaces a linked `shell.json` with a
+  plain file. `dot-omarchy apply|save|diff` moves it; plugins are `plugin` lines in the
+  Archfile. Details in `omarchy/README.md`.
 - **A package with no files under a `$HOME`-shaped path stows nothing**, silently. If one
   seems inert, `find <pkg> -type f` and check the paths mirror `$HOME`.
 - **`install.sh` stays idempotent** (`stow --restow`, every installer checks before

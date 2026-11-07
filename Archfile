@@ -10,6 +10,10 @@
 #   aur     <pkg>                       AUR, via yay
 #   omarchy <pkg> <installer> [args]    run `omarchy-<installer> [args]` when <pkg> is
 #                                       missing; for apps Omarchy sets up beyond the package
+#   plugin  <id> <git-url>              Omarchy shell plugin, cloned with `omarchy plugin add`
+#                                       when ~/.config/omarchy/plugins/<id> is missing. HTTPS URLs,
+#                                       so a fresh machine can clone before SSH keys exist. Where
+#                                       it sits in the bar lives in omarchy/shell.json (dot-omarchy)
 #   ignore  <pkg>                       installed on purpose but not bundled; hides it from `dump`
 #
 # Omarchy already ships git, fzf, starship, tmux, docker, mise and yay, so they are not
@@ -63,7 +67,14 @@ omarchy voxtype-bin voxtype-install            # dictation: downloads the model,
 pacman qt6-websockets
 aur    openxlr
 
-# ── Not bundled ────────────────────────────────────────────────────────────────
+# ── Omarchy shell plugins ────────────────────────────────────────────────────────
+# Third-party code that runs unsandboxed in the shell: review before adding one.
+plugin io.github.v-eagle.omamp             https://github.com/V-EAGLE/omamp.git                 # music player, replaces omarchy.media
+plugin io.github.austindixson.touchbar     https://github.com/austindixson/omarchy-touchbar.git # Touch Bar strip; `dot-omarchy apply` installs the layout
+plugin io.github.grichard99.omaproton-vpn  https://github.com/grichard99/omaproton-vpn.git
+plugin josh2c.protonpass                   https://github.com/josh2c/omarchy-protonpass.git
+
+# ── Not bundled ──────────────────────────────────────────────────────────────────────────
 # Installer and hardware packages: the Omarchy ISO picks these per machine.
 ignore amd-ucode
 ignore efibootmgr

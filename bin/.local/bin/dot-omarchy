@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+# ~/.dotfiles/bin/.local/bin/dot-omarchy — Omarchy shell config that can't be stowed
+# Usage: dot-omarchy [status|diff|apply|save]
+#   status  list tracked files that differ from the live ones; exit 1 if any (default)
+#   diff    show the differences (tracked -> live)
+#   apply   copy the tracked files into ~/.config/omarchy, backing up what they
+#           replace, then install the Touch Bar layout
+#   save    copy the live files back into the repo, to commit
+#
+# Omarchy writes shell.json with mktemp + mv, which replaces a stow symlink with a
+# plain file on the first `omarchy bar` or `omarchy plugin` change. So these files
+# are copied, not linked. See omarchy/README.md.
+set -euo pipefail
+
+DOTFILES="$HOME/.dotfiles"
+SRC="$DOTFILES/omarchy"
+DEST="$HOME/.config/omarchy"
+FILES=(shell.json touchbar.json)
+TOUCHBAR_PLUGIN="$DEST/plugins/io.github.austindixson.touchbar"
+
+log()  { echo "  $1"; }
+info() { echo ""; echo "==> $1"; }
+ok()   { echo "  [ok] $1"; }
+warn() { echo "  [warn] $1" >&2; }
+fail() { echo "  [fail] $1" >&2; exit 1; }
+
+[[ -d "$SRC" ]] || fail "no tracked Omarchy config at $SRC"
+
+# ── status ─────────────────────────────────────────────────────────────────────
+cmd_status() {
+  local f differ=0
+  for f in "${FILES[@]}"; do
+    [[ -f "$SRC/$f" ]] || continue
+    if [[ ! -e "$DEST/$f" ]]; then
+      log "missing  $f (run \`dot-omarchy apply\`)"
+      differ=1
+    elif ! cmp -s "$SRC/$f" "$DEST/$f"; then
+      log "differs  $f (\`dot-omarchy diff\`, then \`apply\` or \`save\`)"
+      differ=1
+    fi
+  done
+  (( differ )) && return 1
+  ok "Omarchy shell config matches the repo"
+}
+
+# ── diff ───────────────────────────────────────────────────────────────────────
+cmd_diff() {
+  local f differ=0
+  for f in "${FILES[@]}"; do
+    [[ -f "$SRC/$f" ]] || continue
+    diff -u --label "repo/$f" --label "live/$f" "$SRC/$f" "$DEST/$f" 2>/dev/null || differ=1
+  done
+  return "$differ"
+}
+
+# ── apply ──────────────────────────────────────────────────────────────────────
+cmd_apply() {
+  local f backup=""
+  info "Omarchy shell config..."
+  mkdir -p "$DEST"
+  for f in "${FILES[@]}"; do
+    [[ -f "$SRC/$f" ]] || continue
+    if [[ -e "$DEST/$f" ]] && cmp -s "$SRC/$f" "$DEST/$f"; then
+      ok "$f"
+      continue
+    fi
+    if [[ -e "$DEST/$f" || -L "$DEST/$f" ]]; then
+      backup="${backup:-$HOME/.backup/dotfiles_$(date +%Y%m%d_%H%M%S)/.config/omarchy}"
+      mkdir -p "$backup"
+      cp -P "$DEST/$f" "$backup/$f"
+      rm -f "$DEST/$f"
+    fi
+    # The shell hot-reloads shell.json, so the bar updates without a restart.
+    install -m 600 "$SRC/$f" "$DEST/$f"
+    ok "$f applied"
+  done
+  if [[ -n "$backup" ]]; then log "previous files backed up to $backup"; fi
+
+  apply_touchbar
+}
+
+# The Touch Bar plugin renders touchbar.json into /etc/tiny-dfr/config.toml (needs
+# root) and its key binds into bindings.lua. bindings.lua is a stow link, which
+# the plugin refuses to follow, so it is pointed at the tracked file directly.
+apply_touchbar() {
+  [[ -f "$DEST/touchbar.json" ]] || return 0
+  if [[ ! -f "$TOUCHBAR_PLUGIN/apply.sh" ]]; then
+    log "Touch Bar plugin not installed, skipping its layout (arch-bundle installs it)"
+    return 0
+  fi
+  if [[ ! -d /usr/share/tiny-dfr ]]; then
+    log "tiny-dfr not installed (no Touch Bar here?), skipping its layout"
+    return 0
+  fi
+  info "Touch Bar layout..."
+  if OMARCHY_TOUCHBAR_BINDINGS="$DOTFILES/hypr/.config/hypr/bindings.lua" \
+    bash "$TOUCHBAR_PLUGIN/apply.sh"; then
+    ok "Touch Bar layout installed"
+  else
+    warn "Touch Bar apply.sh failed: run \`dot-omarchy apply\` again from a terminal"
+  fi
+}
+
+# ── save ───────────────────────────────────────────────────────────────────────
+cmd_save() {
+  local f saved=0
+  for f in "${FILES[@]}"; do
+    [[ -f "$DEST/$f" ]] || continue
+    if [[ -f "$SRC/$f" ]] && cmp -s "$DEST/$f" "$SRC/$f"; then
+      continue
+    fi
+    install -m 644 "$DEST/$f" "$SRC/$f"
+    ok "saved $f"
+    saved=1
+  done
+  if (( saved )); then
+    log "review and commit: git -C $DOTFILES diff -- omarchy/"
+  else
+    ok "nothing to save"
+  fi
+}
+
+case "${1:-status}" in
+  status) cmd_status ;;
+  diff)   cmd_diff ;;
+  apply)  cmd_apply ;;
+  save)   cmd_save ;;
+  -h|--help|help) sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//' ;;
+  *) fail "unknown command '$1' — expected status, diff, apply or save" ;;
+esac

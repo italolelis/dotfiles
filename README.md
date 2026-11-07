@@ -39,6 +39,7 @@ Then open a new terminal. Then work through the [one-time setup](#one-time-setup
 | **Dev tools** | node and gh from brew | node, gh, claude, codex and pi from [mise](https://mise.jdx.dev) |
 | **Agents** | [pi](https://github.com/earendil-works/pi-coding-agent) plus its extensions, [cship](https://cship.dev) status line | same |
 | **SSH keys** | Proton Pass SSH agent, started at login (LaunchAgent) | same (systemd user unit) |
+| **Omarchy bar** | — | shell plugins from the `Archfile`; bar layout, dock and Touch Bar copied by `dot-omarchy apply` ([`omarchy/`](./omarchy)) |
 
 ## Day to day
 
@@ -46,7 +47,9 @@ Then open a new terminal. Then work through the [one-time setup](#one-time-setup
 |---|---|
 | Pull the latest config and install anything new | `dot` |
 | See what's missing on this machine (Omarchy) | `arch-bundle check` |
-| See what I installed but haven't saved (Omarchy) | `arch-bundle dump` |
+| See what I installed but haven't saved (Omarchy) | `arch-bundle dump` (packages and bar plugins) |
+| Save my bar layout / Touch Bar changes (Omarchy) | `dot-omarchy save`, then commit `omarchy/` |
+| See if the bar here differs from the repo (Omarchy) | `dot-omarchy status` / `dot-omarchy diff` |
 | See what's missing on this machine (macOS) | `brew bundle check --file=~/.dotfiles/Brewfile --verbose` |
 | Upgrade the whole system (Omarchy) | `omarchy-update` |
 | Re-run the full installer | `~/.dotfiles/install.sh --force` |

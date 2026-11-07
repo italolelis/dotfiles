@@ -4,12 +4,14 @@
 #   install  install every Archfile entry that is missing (default)
 #   check    list missing entries; exit 1 if any
 #   dump     list explicitly installed packages that neither the Archfile nor
-#            Omarchy's defaults mention, as lines ready to paste into the Archfile
+#            Omarchy's defaults mention, and git-installed Omarchy shell plugins
+#            it doesn't list, as lines ready to paste into the Archfile
 set -euo pipefail
 
 DOTFILES="$HOME/.dotfiles"
 ARCHFILE="${ARCHFILE:-$DOTFILES/Archfile}"
 OMARCHY_PACKAGES=(/usr/share/omarchy/install/omarchy-*.packages)
+PLUGINS_DIR="$HOME/.config/omarchy/plugins"
 
 log()  { echo "  $1"; }
 info() { echo ""; echo "==> $1"; }
@@ -25,6 +27,7 @@ PACMAN=()
 AUR=()
 IGNORE=()
 OMARCHY=()  # "<pkg> <installer> [args]" per entry
+PLUGINS=()  # "<id> <git-url>" per entry
 
 while IFS= read -r line || [[ -n "$line" ]]; do
   line="${line%%#*}"
@@ -39,11 +42,28 @@ while IFS= read -r line || [[ -n "$line" ]]; do
       [[ -n "${rest:-}" ]] || fail "Archfile: 'omarchy $pkg' needs an installer, e.g. install-terminal ghostty"
       OMARCHY+=("$pkg $rest")
       ;;
-    *) fail "Archfile: unknown entry '$kind' (expected pacman, aur, omarchy or ignore)" ;;
+    plugin)
+      [[ -n "${rest:-}" ]] || fail "Archfile: 'plugin $pkg' needs a git URL"
+      PLUGINS+=("$pkg ${rest%% *}")
+      ;;
+    *) fail "Archfile: unknown entry '$kind' (expected pacman, aur, omarchy, plugin or ignore)" ;;
   esac
 done <"$ARCHFILE"
 
 installed() { pacman -Q -- "$1" &>/dev/null; }
+
+# A plugin is installed when its directory (or a package's link) exists.
+plugin_installed() { [[ -e "$PLUGINS_DIR/$1" ]]; }
+
+# git@github.com:owner/repo.git -> https://github.com/owner/repo.git, so dump
+# prints URLs a fresh machine can clone before any SSH key is set up.
+https_url() {
+  local url="$1"
+  if [[ "$url" =~ ^git@([^:]+):(.+)$ ]]; then
+    url="https://${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"
+  fi
+  echo "$url"
+}
 
 missing_of() {
   local pkg
@@ -93,6 +113,23 @@ cmd_install() {
     fi
   done
 
+  # Plugins are only cloned here. ~/.config/omarchy/shell.json, applied by
+  # `dot-omarchy apply`, places them in the bar and turns them on.
+  info "Omarchy shell plugins..."
+  local id url
+  for entry in "${PLUGINS[@]}"; do
+    read -r id url <<<"$entry"
+    if plugin_installed "$id"; then
+      ok "$id"
+    elif command -v omarchy-plugin-add &>/dev/null; then
+      log "Adding $id from $url"
+      omarchy-plugin-add "$url" --yes || { warn "omarchy-plugin-add $url failed"; failed=true; }
+    else
+      warn "omarchy-plugin-add not found — is this Omarchy? Skipping $id"
+      failed=true
+    fi
+  done
+
   $failed && return 1
   ok "Archfile satisfied"
 }
@@ -105,6 +142,10 @@ cmd_check() {
   for entry in "${OMARCHY[@]}"; do
     read -r pkg rest <<<"$entry"
     installed "$pkg" || missing+=("omarchy $pkg")
+  done
+  for entry in "${PLUGINS[@]}"; do
+    read -r pkg rest <<<"$entry"
+    plugin_installed "$pkg" || missing+=("plugin  $pkg")
   done
 
   if (( ${#missing[@]} == 0 )); then
@@ -136,6 +177,20 @@ cmd_dump() {
       extra+=("pacman $pkg")
     fi
   done < <(pacman -Qqe)
+
+  # Git-installed shell plugins. Links (superwhisper, openxlr) belong to the
+  # package that created them, so they are skipped.
+  local dir id url known_plugins
+  known_plugins="$(for entry in "${PLUGINS[@]}"; do echo "${entry%% *}"; done)"
+  for dir in "$PLUGINS_DIR"/*/; do
+    [[ -d "$dir" ]] || continue
+    dir="${dir%/}"
+    [[ -L "$dir" ]] && continue
+    id="$(basename "$dir")"
+    grep -qxF -- "$id" <<<"$known_plugins" && continue
+    url="$(git -C "$dir" remote get-url origin 2>/dev/null)" || continue
+    extra+=("plugin $id $(https_url "$url")")
+  done
 
   if (( ${#extra[@]} == 0 )); then
     ok "Nothing installed outside the Archfile and Omarchy's defaults"

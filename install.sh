@@ -441,6 +441,18 @@ setup_openxlr() {
   fi
 }
 
+# ── Omarchy shell config ───────────────────────────────────────────────────────
+# Bar layout, dock, idle and the Touch Bar layout are copied, not stowed (see
+# omarchy/README.md). arch-bundle has cloned the plugins they reference by now.
+setup_omarchy_shell() {
+  if ! command -v omarchy-plugin-add &>/dev/null; then
+    log "not Omarchy — skipping the Omarchy shell config"
+    return 0
+  fi
+  "$DOTFILES/bin/.local/bin/dot-omarchy" apply \
+    || log "[warn] dot-omarchy apply failed — review output above"
+}
+
 # ── Main ───────────────────────────────────────────────────────────────────────
 main() {
   echo ""
@@ -477,7 +489,7 @@ main() {
   configure_git_credentials
   configure_repo_git
   install_proton_ssh_agent
-  if $IS_LINUX; then setup_openxlr; fi
+  if $IS_LINUX; then setup_openxlr; setup_omarchy_shell; fi
   check_login_shell
   install_mise_tools
 

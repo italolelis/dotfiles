@@ -46,6 +46,13 @@ if $IS_LINUX && command -v pacman &>/dev/null; then
   "$DOTFILES/bin/.local/bin/arch-bundle" install
 fi
 
+# 4b. Omarchy shell config is copied, not stowed, and Omarchy edits it in place.
+#     Only report drift: applying here would overwrite changes made on this machine.
+if $IS_LINUX && command -v omarchy-plugin-add &>/dev/null; then
+  info "Checking Omarchy shell config..."
+  "$DOTFILES/bin/.local/bin/dot-omarchy" status || true
+fi
+
 # 5. Install anything new in the mise config
 if command -v mise &>/dev/null; then
   info "Installing mise tools..."
